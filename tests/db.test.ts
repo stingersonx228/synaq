@@ -152,3 +152,17 @@ describe("aggregateStats", () => {
     expect(aggregateStats([], [])).toEqual({ studentCount: 0, roundCount: 0, types: [], blindSpots: [], students: [] });
   });
 });
+
+describe("demo class", () => {
+  it("is deterministic, has 30 students and plausible problem rates", async () => {
+    const { demoClassStats } = await import("../lib/demo");
+    const a = demoClassStats();
+    expect(demoClassStats()).toEqual(a);
+    expect(a.studentCount).toBe(30);
+    expect(new Set(a.students.map((s) => s.nickname)).size).toBe(30);
+    expect(a.roundCount).toBeGreaterThan(150);
+    expect(a.blindSpots).toHaveLength(3);
+    for (const t of a.types) expect(t.problemRate).toBeGreaterThan(0.02);
+    for (const t of a.types) expect(t.problemRate).toBeLessThan(0.9);
+  });
+});
