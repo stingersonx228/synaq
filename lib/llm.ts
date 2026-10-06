@@ -52,7 +52,7 @@ export async function complete(req: Completion): Promise<string | null> {
   } catch (err) {
     // Log only the error kind, never request content.
     const status = err instanceof Anthropic.APIError ? err.status : undefined;
-    console.warn(`llm call failed: ${err instanceof Error ? err.name : "unknown"}${status ? ` (${status})` : ""}`);
+    console.warn(`llm call failed: ${err instanceof Error ? err.constructor.name : "unknown"}${status ? ` (${status})` : ""}`);
     return null;
   }
 }
