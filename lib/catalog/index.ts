@@ -1,0 +1,109 @@
+import type { Case } from "../types";
+import { CASES } from "./cases";
+import type { RefuteFailReason } from "../refute";
+
+export { CASES };
+
+export const SESSION_ROUNDS = 6;
+export const SESSION_LIVES = 3;
+
+const BY_ID = new Map(CASES.map((c) => [c.id, c]));
+
+export function getCase(id: string): Case | undefined {
+  return BY_ID.get(id);
+}
+
+export const CASE_IDS = CASES.map((c) => c.id);
+
+export const TYPE_NAMES: Record<string, string> = {
+  percent_add: "Проценты: сложение скидок",
+  percent_base: "Проценты: не та база",
+  fraction_add: "Дроби: сложение знаменателей",
+  odz: "ОДЗ: деление на ноль",
+  extraneous_root: "Посторонние корни",
+  sign_transfer: "Перенос без смены знака",
+  square_sum: "Квадрат суммы",
+  ineq_sign: "Неравенства: деление на минус",
+  percent_symmetric: "Проценты: «+50% и −50%»",
+  lost_root: "Потерянный корень",
+  clean: "Верное решение: ложная тревога",
+};
+
+export function typeName(typeId: string): string {
+  return TYPE_NAMES[typeId] ?? typeId;
+}
+
+/** Fixed intern lines that never come from the LLM. */
+export const INTERN_LINES = {
+  greeting: "Привет! Я Алибек, стажёр. Задачу уже решил, всё точно верно. Можешь проверить, но ошибок не найдёшь.",
+  wrongLine: (step: number) => `В строке ${step} у меня всё верно. Можешь пересчитать — сойдётся.`,
+  missedBug: "Вот и я говорю: всё идеально!",
+  cleanWin: "Вот видишь, я же говорил. Спасибо, что проверил каждую строку честно.",
+  askProof: "Слова — это слова. Докажи на числах.",
+  proofFailed: {
+    invalid_input: "Ну и что это за число? Давай нормальное.",
+    undefined: "Так нечестно, тут вообще ничего не посчитать.",
+    values_equal: "Вот видишь, получилось одно и то же. Мой способ работает.",
+    claim_false: "Это вообще не мой ответ. Ты проверяешь что-то своё.",
+    original_holds: "Подставил — всё сходится. Я же говорил!",
+    not_a_solution: "Это число к уравнению не подходит. Мимо.",
+    already_claimed: "Так это число у меня и так есть в ответе.",
+    unknown_mode: "Не понимаю, что ты проверяешь.",
+  } satisfies Record<RefuteFailReason, string>,
+  stubborn: [
+    "Всё равно не убедил. Я это уже проверил.",
+    "У нас в команде так всегда делают. Попробуй ещё.",
+  ],
+} as const;
+
+/** Lowercase, collapse whitespace, unify minus/dash characters. */
+export function normalizeText(text: string): string {
+  return text
+    .toLowerCase()
+    .replace(/[−‒–—]/g, "-")
+    .replace(/ё/g, "е")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+/** Strips all whitespace and the tenge sign for answer comparison. */
+export function compactAnswer(text: string): string {
+  return normalizeText(text).replace(/[\s₸]/g, "");
+}
+
+/** No-LLM fallback: the explanation names the cause if it contains at least one keyword root. */
+export function keywordJudge(c: Case, explanation: string): boolean {
+  if (!c.bug) return false;
+  const text = normalizeText(explanation);
+  return c.bug.keywords.some((k) => text.includes(normalizeText(k)));
+}
+
+export type Rng = () => number;
+
+export function shuffle<T>(items: readonly T[], rng: Rng = Math.random): T[] {
+  const out = [...items];
+  for (let i = out.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [out[i], out[j]] = [out[j], out[i]];
+  }
+  return out;
+}
+
+/** Picks a session: exactly one clean case, the rest unique buggy cases, in random order. */
+export function pickSessionCases(rounds: number = SESSION_ROUNDS, rng: Rng = Math.random): string[] {
+  const clean = shuffle(CASES.filter((c) => c.bug === null), rng);
+  const buggy = shuffle(CASES.filter((c) => c.bug !== null), rng);
+  if (clean.length === 0 || rounds < 1) return buggy.slice(0, rounds).map((c) => c.id);
+  const picked = [clean[0], ...buggy.slice(0, rounds - 1)];
+  return shuffle(picked, rng).map((c) => c.id);
+}
+
+/** Picks a replacement case not in `exclude`, keeping the same clean/buggy kind when possible. */
+export function pickReplacement(current: string, exclude: string[], rng: Rng = Math.random): string | null {
+  const cur = getCase(current);
+  const pool = CASES.filter((c) => c.id !== current && !exclude.includes(c.id));
+  if (pool.length === 0) return null;
+  const sameKind = pool.filter((c) => (c.bug === null) === (cur?.bug === null));
+  const source = sameKind.length > 0 ? sameKind : pool;
+  return source[Math.floor(rng() * source.length)].id;
+}
