@@ -17,7 +17,7 @@
 - UI redesign ("red pen on someone else's exam"): one accent color, Unbounded for headings, Geist for text, JetBrains Mono for line numbers and numbers, all via next/font (self-hosted at build time; the build needs network access to Google Fonts). Unbounded is loaded as a variable font because explicit weights break the Turbopack build.
 - Icons: @phosphor-icons/react (SSR entry), no hand-drawn SVG.
 - Dark theme only, as the spec requires a dark default and the main use is a stage projector.
-- Supabase migration was not applied: the connected project's DB timed out and the other projects in the account are unrelated.
+- Production database: a dedicated free Supabase project `synaq` in eu-central-1 (the project this session was first connected to never answered, and the other projects in the account belong to unrelated apps). Vercel functions run in fra1 next to it.
 - Request bodies are capped at 4 KB (413). Per-IP anti-spam windows in memory: join 120/10 min (a class shares one school IP), class creation 10/hour, dashboard reads 120/10 min.
 - `llm_calls` rows older than 2 hours are pruned opportunistically (2% of inserts).
 - Proof checks use the number-only mathjs build (`mathjs/number`): the game chunk drops from 691 KB to 424 KB. Square roots of negatives give NaN instead of a complex number; both are "not a finite number" for the checker, and all catalog demos/decoys and tests behave identically.

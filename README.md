@@ -33,11 +33,15 @@ npm run dev
 
 ## Supabase
 
-1. Создайте проект на supabase.com.
-2. SQL Editor → выполните `supabase/migrations/0001_init.sql` (или `supabase db push`).
-3. Settings → API: скопируйте Project URL и service_role key в переменные окружения.
+Рабочая база: проект `synaq` (ref `ydjlnbfrmccnrdkceftl`, регион eu-central-1, Франкфурт) в организации NagyzDoner. Миграция `supabase/migrations/0001_init.sql` уже применена. Серверные функции Vercel работают в том же регионе (`vercel.json` → `fra1`).
 
-RLS включён на всех таблицах без политик: доступ только через серверные route handlers с service-role ключом.
+В Vercel нужны две переменные:
+- `NEXT_PUBLIC_SUPABASE_URL` = `https://ydjlnbfrmccnrdkceftl.supabase.co` (уже задана);
+- `SUPABASE_SERVICE_ROLE_KEY`: секретный ключ из Supabase → Project Settings → API Keys (`service_role` или `sb_secret_…`), тип Sensitive, только сервер.
+
+Новая база с нуля: создать проект, выполнить `supabase/migrations/0001_init.sql` в SQL Editor и задать те же две переменные.
+
+RLS включён на всех таблицах без политик, а у ролей `anon` и `authenticated` отозваны все права: доступ только через серверные route handlers с service-role ключом.
 
 ## Деплой на Vercel
 
