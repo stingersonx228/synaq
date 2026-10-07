@@ -48,6 +48,10 @@ export function validateCatalog(cases: Case[]): string[] {
       if (!nonEmpty(bug[key])) at(`empty bug.${key}`);
     }
     if (bug.keywords.length < 3) at("keywords < 3");
+    // Naming the answer is not naming the cause, so no keyword may be part of the correct answer.
+    for (const k of bug.keywords) {
+      if (compactAnswer(bug.correct_answer).includes(compactAnswer(k))) at(`keyword is part of the correct answer: ${k}`);
+    }
     bug.keywords.forEach((k) => {
       if (!nonEmpty(k)) at("empty keyword");
       else if (k !== k.toLowerCase()) at(`keyword not lowercase: ${k}`);

@@ -149,3 +149,11 @@ describe("pickPracticeCases", () => {
     expect(pickPracticeCases(["log_sum"], ["log-01"])).toContain("log-01");
   });
 });
+
+describe("validateCatalog: keywords", () => {
+  it("rejects a keyword that is just part of the correct answer", () => {
+    const c = structuredClone(getCase("sq-01")!);
+    c.bug!.keywords = [...c.bug!.keywords, "6x"];
+    expect(validateCatalog([c, getCase("lin-ok")!]).join("\n")).toContain("keyword is part of the correct answer: 6x");
+  });
+});
