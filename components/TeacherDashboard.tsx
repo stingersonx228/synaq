@@ -71,7 +71,7 @@ export default function TeacherDashboard({
         {plural(stats.roundCount, ["раунд", "раунда", "раундов"])}
       </p>
 
-      {status ? <RoundFeed rounds={stats.recent ?? []} /> : null}
+      {status || demo ? <RoundFeed rounds={stats.recent ?? []} /> : null}
 
       {stats.studentCount === 0 ? (
         <Empty>
