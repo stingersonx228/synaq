@@ -28,3 +28,6 @@
 - The judge cache key includes the case's canonical cause, so editing a case invalidates its old verdicts. Dashboard pagination orders by `created_at, id`. Rate limiting prefers `x-real-ip` (set by Vercel) over the first `x-forwarded-for` entry.
 - Teacher panel is live: it polls `/api/teacher/[token]/stats` every 5 s while the tab is visible (per-IP stats window raised to 600 per 10 min). It shows the class code with a join QR (rendered server-side to SVG with `qrcode`, linking to `/?code=XXXXXX#join`, which prefills the join form) and a full-screen mode for projectors.
 - "Что разобрать на уроке" turns the top blind spots into a short lesson plan from the catalog's own cause/fix/task/hint; the panel prints as a light-theme report.
+- Catalog grew to 18 cases (16 error types, 2 clean cases): powers, square root of a sum, absolute value, quadratic formula sign, logarithm sum, cancelling terms, a second clean percent case. The "exactly one clean case among 11" rule now reads "at least one clean case"; sessions still contain exactly one.
+- "Потренировать слепые пятна" starts a practice session: one case per weak type (an unplayed one when the type has several), topped up to 4 rounds with fresh cases.
+- Confetti on Alibek's concession is CSS-only, deterministic and hidden under prefers-reduced-motion.

@@ -23,6 +23,12 @@ const DIFFICULTY: Record<string, number> = {
   square_sum: 0.26,
   sign_transfer: 0.19,
   fraction_add: 0.12,
+  log_sum: 0.61,
+  root_formula: 0.44,
+  abs_lost: 0.42,
+  sqrt_sum: 0.34,
+  power_mult: 0.29,
+  cancel_terms: 0.33,
 };
 
 const NICK_ROOTS = ["Барыс", "Қыран", "Тұлпар", "Арлан", "Самұрық", "Бүркіт", "Жұлдыз", "Сұңқар", "Шағала", "Көкжал"];

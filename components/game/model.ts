@@ -71,8 +71,9 @@ export function newRound(caseId: string, token: number): Round {
   };
 }
 
-export function newGame(fixedCaseId: string | null, token: number): GameState {
-  const caseIds = fixedCaseId ? [fixedCaseId] : pickSessionCases();
+/** `caseIds` overrides the random pick (used by blind-spot practice). */
+export function newGame(fixedCaseId: string | null, token: number, presetCaseIds?: string[]): GameState {
+  const caseIds = presetCaseIds?.length ? presetCaseIds : fixedCaseId ? [fixedCaseId] : pickSessionCases();
   return {
     caseIds,
     index: 0,

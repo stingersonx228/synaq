@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowCounterClockwiseIcon, CheckIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowCounterClockwiseIcon, CheckIcon, TargetIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { SESSION_LIVES, typeName } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import { blindSpots, stars } from "@/lib/scoring";
@@ -15,12 +15,14 @@ export default function Summary({
   offline,
   student,
   onRestart,
+  onPractice,
 }: {
   game: GameState;
   fixedCaseId: string | null;
   offline: boolean;
   student: StudentIdentity | null;
   onRestart: () => void;
+  onPractice: () => void;
 }) {
   const played = game.results.length;
   const solved = game.results.filter((r) => r.outcome === "solved").length;
@@ -105,7 +107,13 @@ export default function Summary({
         </section>
 
         <div className="mt-12 flex flex-wrap items-center gap-3">
-          <Button onClick={onRestart}>
+          {spots.length > 0 && !fixedCaseId ? (
+            <Button onClick={onPractice}>
+              <TargetIcon size={18} weight="bold" aria-hidden />
+              Потренировать слепые пятна
+            </Button>
+          ) : null}
+          <Button onClick={onRestart} variant={spots.length > 0 && !fixedCaseId ? "secondary" : "primary"}>
             <ArrowCounterClockwiseIcon size={18} weight="bold" aria-hidden />
             Играть ещё
           </Button>

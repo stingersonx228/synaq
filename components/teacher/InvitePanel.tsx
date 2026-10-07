@@ -63,12 +63,12 @@ export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; jo
       aria-label="Приглашение в класс"
       className={
         fullscreen
-          ? `flex min-h-[100dvh] flex-col items-center justify-center gap-10 bg-ink p-10 text-center ${overlay ? "fixed inset-0 z-50 overflow-y-auto" : ""}`
+          ? `flex min-h-[100dvh] flex-col items-center justify-center gap-6 bg-ink p-6 text-center sm:gap-8 sm:p-10 ${overlay ? "fixed inset-0 z-50 overflow-y-auto" : ""}`
           : "mt-6 grid gap-6 rounded-xl border border-line bg-surface p-5 sm:grid-cols-[auto_1fr] sm:items-center print:hidden"
       }
     >
       <div
-        className={`overflow-hidden rounded-xl bg-white ${fullscreen ? "w-[min(60vh,80vw)]" : "w-40 sm:w-44"}`}
+        className={`overflow-hidden rounded-xl bg-white ${fullscreen ? "w-[min(46vh,70vw)]" : "w-40 sm:w-44"}`}
         // The SVG is generated on our server from the join URL; it contains no user input but the code.
         dangerouslySetInnerHTML={{ __html: qrSvg }}
       />
@@ -77,7 +77,7 @@ export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; jo
           Отсканируй QR или открой ссылку и введи код
         </p>
         <p
-          className={`font-mono font-bold tracking-[0.25em] text-pen ${fullscreen ? "text-[clamp(4rem,12vw,9rem)] leading-none" : "text-4xl sm:text-5xl"}`}
+          className={`font-mono font-bold tracking-[0.25em] text-pen ${fullscreen ? "text-[clamp(3.5rem,11vh,8rem)] leading-none" : "text-4xl sm:text-5xl"}`}
         >
           {code}
         </p>

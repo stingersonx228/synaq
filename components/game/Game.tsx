@@ -2,7 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowsClockwiseIcon } from "@phosphor-icons/react/dist/ssr";
-import { getCase, INTERN_LINES, pickReplacement } from "@/lib/catalog";
+import { getCase, INTERN_LINES, pickPracticeCases, pickReplacement } from "@/lib/catalog";
 import { fetchInternReply, fetchJudgeVerdict, newId, saveAttempt, type NetOptions } from "@/lib/client";
 import { checkRefutation, explainRefutation, parseValues } from "@/lib/refute";
 import { blindSpots, MAX_HINTS, MAX_REFUTE_TRIES, roundScore, stars } from "@/lib/scoring";
@@ -22,6 +22,7 @@ import {
   TopBar,
 } from "./parts";
 import SolutionSheet, { type LineState } from "./SolutionSheet";
+import Confetti from "./Confetti";
 import Summary from "./Summary";
 
 const TYPING_MS = 500;
@@ -247,9 +248,18 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     setGame(newGame(fixedCaseId, nextToken()));
   }
 
+  function practice() {
+    judgeRef.current = null;
+    const cases = pickPracticeCases(
+      blindSpots(game.results),
+      game.results.map((r) => r.caseId),
+    );
+    setGame(newGame(null, nextToken(), cases));
+  }
+
 
   if (game.over) {
-    return <Summary game={game} fixedCaseId={fixedCaseId} offline={offline} student={student} onRestart={restart} />;
+    return <Summary game={game} fixedCaseId={fixedCaseId} offline={offline} student={student} onRestart={restart} onPractice={practice} />;
   }
 
   const done = round.phase === "done";
@@ -270,6 +280,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
           className={`pointer-events-none fixed inset-0 z-40 ${game.flash.kind === "good" ? "flash-good" : "flash-bad"}`}
         />
       ) : null}
+      {game.flash?.kind === "good" && won && c.bug ? <Confetti key={game.flash.key} /> : null}
       <TopBar game={game} offline={offline} student={student} />
 
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:py-8 xl:grid-cols-[minmax(0,1fr)_26rem]">

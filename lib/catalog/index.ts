@@ -26,6 +26,12 @@ export const TYPE_NAMES: Record<string, string> = {
   ineq_sign: "Неравенства: деление на минус",
   percent_symmetric: "Проценты: «+50% и −50%»",
   lost_root: "Потерянный корень",
+  power_mult: "Степени: перемножение показателей",
+  sqrt_sum: "Корень из суммы",
+  abs_lost: "Модуль: потерянный случай",
+  root_formula: "Формула корней: знак b",
+  log_sum: "Логарифмы: сумма вместо произведения",
+  cancel_terms: "Дроби: сокращение слагаемых",
   clean: "Решение без ошибки",
 };
 
@@ -91,6 +97,27 @@ export function pickSessionCases(rounds: number = SESSION_ROUNDS, rng: Rng = Mat
   if (clean.length === 0 || rounds < 1) return buggy.slice(0, rounds).map((c) => c.id);
   const picked = [clean[0], ...buggy.slice(0, rounds - 1)];
   return shuffle(picked, rng).map((c) => c.id);
+}
+
+export const PRACTICE_MIN_ROUNDS = 4;
+
+/**
+ * Practice session for a student's blind spots: one case per weak error type (preferring a
+ * case not just played), topped up with unplayed cases to PRACTICE_MIN_ROUNDS, shuffled.
+ */
+export function pickPracticeCases(spotTypes: string[], played: string[], rng: Rng = Math.random): string[] {
+  const picked: string[] = [];
+  for (const type of spotTypes.slice(0, SESSION_ROUNDS)) {
+    const ofType = shuffle(CASES.filter((c) => c.type_id === type), rng);
+    const choice = ofType.find((c) => !played.includes(c.id)) ?? ofType[0];
+    if (choice && !picked.includes(choice.id)) picked.push(choice.id);
+  }
+  const fresh = shuffle(
+    CASES.filter((c) => c.bug !== null && !played.includes(c.id) && !picked.includes(c.id)),
+    rng,
+  );
+  while (picked.length < PRACTICE_MIN_ROUNDS && fresh.length > 0) picked.push(fresh.shift()!.id);
+  return shuffle(picked, rng);
 }
 
 /** Picks a replacement case not in `exclude`, keeping the same clean/buggy kind when possible. */

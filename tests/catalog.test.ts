@@ -5,7 +5,9 @@ import {
   CASES,
   getCase,
   keywordJudge,
+  pickPracticeCases,
   pickReplacement,
+  PRACTICE_MIN_ROUNDS,
   pickSessionCases,
   SESSION_ROUNDS,
   typeName,
@@ -20,10 +22,12 @@ describe("catalog", () => {
     expect(validateCatalog(CASES)).toEqual([]);
   });
 
-  it("has 11 cases with unique ids and exactly one clean case", () => {
-    expect(CASES).toHaveLength(11);
+  it("has at least 11 cases with unique ids, most of them buggy, and clean cases for every session", () => {
+    expect(CASES.length).toBeGreaterThanOrEqual(11);
     expect(new Set(CASES.map((c) => c.id)).size).toBe(CASES.length);
-    expect(CASES.filter((c) => c.bug === null)).toHaveLength(1);
+    const clean = CASES.filter((c) => c.bug === null).length;
+    expect(clean).toBeGreaterThanOrEqual(1);
+    expect(CASES.length - clean).toBeGreaterThanOrEqual(SESSION_ROUNDS - 1);
   });
 
   describe.each(CASES.map((c) => [c.id, c] as const))("%s", (_id, c) => {
@@ -109,5 +113,30 @@ describe("session picking", () => {
     const exclude = CASES.map((c) => c.id).filter((id) => id !== "sq-01" && id !== "pct-01");
     expect(pickReplacement("pct-01", exclude)).toBe("sq-01");
     expect(pickReplacement("pct-01", CASES.map((c) => c.id))).toBeNull();
+  });
+});
+
+describe("pickPracticeCases", () => {
+  it("covers every blind-spot type, tops up to the minimum and never repeats a case", () => {
+    for (let i = 0; i < 30; i++) {
+      const ids = pickPracticeCases(["odz", "percent_add"], ["odz-01", "pct-01", "sq-01"]);
+      expect(ids.length).toBeGreaterThanOrEqual(PRACTICE_MIN_ROUNDS);
+      expect(new Set(ids).size).toBe(ids.length);
+      const types = ids.map((id) => getCase(id)!.type_id);
+      expect(types).toContain("odz");
+      expect(types).toContain("percent_add");
+      // Top-up cases are fresh: nothing already played except the blind-spot cases themselves.
+      expect(ids).not.toContain("sq-01");
+    }
+  });
+
+  it("prefers an unplayed case when a type has several", () => {
+    for (let i = 0; i < 20; i++) {
+      expect(pickPracticeCases(["clean"], ["lin-ok"])).toContain("pct-ok");
+    }
+  });
+
+  it("replays the same case when it is the only one of its type", () => {
+    expect(pickPracticeCases(["log_sum"], ["log-01"])).toContain("log-01");
   });
 });
