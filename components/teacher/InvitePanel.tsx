@@ -69,6 +69,8 @@ export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; jo
     >
       <div
         className={`overflow-hidden rounded-xl bg-white ${fullscreen ? "w-[min(46vh,70vw)]" : "w-40 sm:w-44"}`}
+        role="img"
+        aria-label={`QR-код для входа в класс ${code}`}
         // The SVG is generated on our server from the join URL; it contains no user input but the code.
         dangerouslySetInnerHTML={{ __html: qrSvg }}
       />
