@@ -31,3 +31,5 @@
 - Catalog grew to 18 cases (16 error types, 2 clean cases): powers, square root of a sum, absolute value, quadratic formula sign, logarithm sum, cancelling terms, a second clean percent case. The "exactly one clean case among 11" rule now reads "at least one clean case"; sessions still contain exactly one.
 - "Потренировать слепые пятна" starts a practice session: one case per weak type (an unplayed one when the type has several), topped up to 4 rounds with fresh cases.
 - Confetti on Alibek's concession is CSS-only, deterministic and hidden under prefers-reduced-motion.
+- The landing page answers the jury's main question ("why not just ask ChatGPT to play dumb") with facts computed from the catalog, not marketing numbers.
+- Per-student weak types (top 3 by problem rounds) show in the teacher's student table; blind spots on the session summary expand into the cause and fix of the case the student actually played.

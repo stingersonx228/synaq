@@ -225,9 +225,9 @@ describe("aggregateStats", () => {
     expect(s.types[0]).toMatchObject({ missed: 1, fullHints: 1, lifeLost: 0 });
     expect(s.blindSpots.map((t) => t.typeId)).toEqual(["odz", "lost_root"]);
     expect(s.students).toEqual([
-      { nickname: "Барыс", rounds: 3, avgScore: 53, lastActive: "2026-10-02T10:00:00Z" },
-      { nickname: "Тулпар", rounds: 2, avgScore: 70, lastActive: "2026-10-01T10:00:00Z" },
-      { nickname: "Новичок", rounds: 0, avgScore: 0, lastActive: null },
+      { nickname: "Барыс", rounds: 3, avgScore: 53, lastActive: "2026-10-02T10:00:00Z", weakTypes: ["odz", "lost_root"] },
+      { nickname: "Тулпар", rounds: 2, avgScore: 70, lastActive: "2026-10-01T10:00:00Z", weakTypes: ["odz"] },
+      { nickname: "Новичок", rounds: 0, avgScore: 0, lastActive: null, weakTypes: [] },
     ]);
   });
 

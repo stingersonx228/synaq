@@ -33,7 +33,11 @@ export interface StudentStat {
   rounds: number;
   avgScore: number;
   lastActive: string | null;
+  /** The student's own blind spots: error types with problem rounds, worst first, up to 3. */
+  weakTypes: string[];
 }
+
+const STUDENT_WEAK_TYPES = 3;
 
 export interface ClassStats {
   studentCount: number;
@@ -81,14 +85,18 @@ export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): 
         TYPE_ORDER.indexOf(x.typeId) - TYPE_ORDER.indexOf(y.typeId),
     );
 
-  const perStudent = new Map<string, { rounds: number; total: number; last: string | null }>();
-  for (const s of students) perStudent.set(s.id, { rounds: 0, total: 0, last: null });
+  const perStudent = new Map<
+    string,
+    { rounds: number; total: number; last: string | null; problems: Map<string, number> }
+  >();
+  for (const s of students) perStudent.set(s.id, { rounds: 0, total: 0, last: null, problems: new Map() });
   for (const a of attempts) {
     const s = perStudent.get(a.student_id);
     if (!s) continue;
     s.rounds += 1;
     s.total += a.score;
     if (!s.last || a.created_at > s.last) s.last = a.created_at;
+    if (isProblemRound(a)) s.problems.set(a.type_id, (s.problems.get(a.type_id) ?? 0) + 1);
   }
   const studentStats = students
     .map((s) => {
@@ -98,6 +106,10 @@ export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): 
         rounds: p.rounds,
         avgScore: p.rounds > 0 ? Math.round(p.total / p.rounds) : 0,
         lastActive: p.last,
+        weakTypes: [...p.problems.entries()]
+          .sort((x, y) => y[1] - x[1] || TYPE_ORDER.indexOf(x[0]) - TYPE_ORDER.indexOf(y[0]))
+          .slice(0, STUDENT_WEAK_TYPES)
+          .map(([typeId]) => typeId),
       };
     })
     .sort(

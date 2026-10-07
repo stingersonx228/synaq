@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { ArrowCounterClockwiseIcon, CheckIcon, TargetIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
-import { SESSION_LIVES, typeName } from "@/lib/catalog";
+import { ArrowCounterClockwiseIcon, CaretDownIcon, CheckIcon, TargetIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
+import { getCase, SESSION_LIVES, typeName } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import { blindSpots, stars } from "@/lib/scoring";
 import type { StudentIdentity } from "@/lib/session";
@@ -93,14 +93,48 @@ export default function Summary({
           ) : (
             <>
               <p className="mt-2 max-w-[60ch] text-muted">
-                Эти ошибки ты пропустил или нашёл только с подсказкой. Повтори их в следующей игре.
+                Эти ошибки ты пропустил или нашёл только с подсказкой. Нажми, чтобы разобраться, или потренируй их.
               </p>
-              <ul className="mt-4 flex flex-wrap gap-2">
-                {spots.map((t) => (
-                  <li key={t} className="rounded-xl border border-pen/40 bg-pen/10 px-4 py-2 text-lg">
-                    {typeName(t)}
-                  </li>
-                ))}
+              <ul className="mt-4 flex flex-col gap-2">
+                {spots.map((t) => {
+                  // Explain with the case the student actually played for this error type.
+                  const played = game.results.find((r) => r.typeId === t);
+                  const c = played ? getCase(played.caseId) : undefined;
+                  return (
+                    <li key={t}>
+                      <details className="group rounded-xl border border-pen/40 bg-pen/10 open:bg-surface">
+                        <summary className="flex min-h-12 cursor-pointer list-none items-center justify-between gap-3 px-4 py-2 text-lg [&::-webkit-details-marker]:hidden">
+                          {typeName(t)}
+                          <CaretDownIcon
+                            size={18}
+                            className="shrink-0 text-pen transition-transform group-open:rotate-180"
+                            aria-hidden
+                          />
+                        </summary>
+                        <div className="flex flex-col gap-2 px-4 pb-4 leading-relaxed">
+                          {c?.bug ? (
+                            <>
+                              <p>
+                                <span className="text-muted">В чём ошибка: </span>
+                                {c.bug.cause}
+                              </p>
+                              <p>
+                                <span className="text-muted">Как правильно: </span>
+                                {c.bug.fix}
+                              </p>
+                            </>
+                          ) : (
+                            <p>
+                              <span className="text-muted">Что случилось: </span>
+                              решение было верным, а ошибку ты увидел в правильном шаге. Прежде чем обвинять строку,
+                              подставь ответ в исходное условие.
+                            </p>
+                          )}
+                        </div>
+                      </details>
+                    </li>
+                  );
+                })}
               </ul>
             </>
           )}

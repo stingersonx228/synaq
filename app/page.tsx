@@ -1,12 +1,46 @@
 import Link from "next/link";
-import { ArrowRightIcon, ChalkboardTeacherIcon } from "@phosphor-icons/react/dist/ssr";
+import {
+  ArrowRightIcon,
+  ChalkboardTeacherIcon,
+  ChatCircleDotsIcon,
+  FunctionIcon,
+  ListChecksIcon,
+  ShieldCheckIcon,
+} from "@phosphor-icons/react/dist/ssr";
 import JoinForm from "@/components/JoinForm";
 import SolutionSheet from "@/components/game/SolutionSheet";
 import { buttonClass, InternAvatar, Wordmark } from "@/components/game/ui";
-import { getCase } from "@/lib/catalog";
+import { CASES, getCase } from "@/lib/catalog";
+import { plural } from "@/lib/plural";
 import { codeFromParam } from "@/lib/schemas";
 
 const PREVIEW = getCase("pct-01")!;
+
+const BUGGY = CASES.filter((c) => c.bug !== null);
+const ERROR_TYPES = new Set(BUGGY.map((c) => c.type_id)).size;
+
+const WHY = [
+  {
+    Icon: ListChecksIcon,
+    title: `${CASES.length} ${plural(CASES.length, ["задача", "задачи", "задач"])}, ${ERROR_TYPES} ${plural(ERROR_TYPES, ["тип", "типа", "типов"])} ошибок`,
+    text: "Каждая ошибка заложена заранее и размечена: какая строка неверна, в чём причина и каким числом её опровергнуть. ИИ ничего не выдумывает.",
+  },
+  {
+    Icon: FunctionIcon,
+    title: "Сдаётся только по математике",
+    text: "Контрпример ученика проверяет код, а не нейросеть. Уговорить Алибека нельзя, обмануть тоже.",
+  },
+  {
+    Icon: ChatCircleDotsIcon,
+    title: "ИИ только озвучивает",
+    text: "Нейросеть пишет реплики упрямого стажёра и оценивает объяснение. Без неё игра работает целиком, даже офлайн.",
+  },
+  {
+    Icon: ShieldCheckIcon,
+    title: "Без персональных данных",
+    text: "Вход по коду класса и псевдониму. Объяснения учеников не сохраняются.",
+  },
+] as const;
 
 const FLOW = [
   ["Найди", "Нажми на строку, где Алибек ошибся. Или докажи, что ошибок нет: иногда он прав."],
@@ -79,6 +113,29 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               </li>
             ))}
           </ol>
+        </section>
+
+        <section className="mx-auto grid w-full max-w-7xl grid-cols-1 gap-10 px-4 pt-20 lg:grid-cols-[1fr_1.4fr] [&>*]:min-w-0">
+          <div>
+            <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
+              Это не «попроси ChatGPT притвориться глупым»
+            </h2>
+            <p className="mt-4 max-w-[44ch] text-lg leading-relaxed text-muted">
+              Чат-бот может ошибиться случайно и сдаться от любого нажима. Алибек ошибается по плану и признаёт
+              ошибку только перед доказательством.
+            </p>
+          </div>
+          <ul className="flex flex-col divide-y divide-line border-y border-line">
+            {WHY.map(({ Icon, title, text }) => (
+              <li key={title} className="grid grid-cols-[2.5rem_1fr] gap-4 py-5">
+                <Icon size={28} weight="duotone" className="mt-0.5 text-pen" aria-hidden />
+                <div>
+                  <h3 className="text-xl font-semibold">{title}</h3>
+                  <p className="mt-1 max-w-[60ch] leading-relaxed text-muted">{text}</p>
+                </div>
+              </li>
+            ))}
+          </ul>
         </section>
 
         <section

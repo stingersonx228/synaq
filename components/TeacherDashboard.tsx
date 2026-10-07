@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Wordmark } from "@/components/game/ui";
 import LessonPlan from "@/components/teacher/LessonPlan";
 import PrintButton from "@/components/teacher/PrintButton";
+import { typeName } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import type { ClassStats } from "@/lib/stats";
 
@@ -150,12 +151,13 @@ export default function TeacherDashboard({
         <section className="mt-10">
           <h2 className="font-display text-xl font-bold">Ученики</h2>
           <div className="mt-3 overflow-x-auto rounded-xl border border-line">
-            <table className="w-full min-w-[520px] text-left">
+            <table className="w-full min-w-[720px] text-left">
               <thead className="bg-surface text-sm text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Псевдоним</th>
                   <th className="px-4 py-3 text-right font-semibold">Раундов</th>
                   <th className="px-4 py-3 text-right font-semibold">Средний балл</th>
+                  <th className="px-4 py-3 font-semibold">Слабые темы</th>
                   <th className="px-4 py-3 font-semibold">Последняя активность</th>
                 </tr>
               </thead>
@@ -165,6 +167,19 @@ export default function TeacherDashboard({
                     <td className="px-4 py-3 font-medium">{s.nickname}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{s.rounds}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{s.rounds > 0 ? s.avgScore : "-"}</td>
+                    <td className="px-4 py-3">
+                      {(s.weakTypes ?? []).length > 0 ? (
+                        <ul className="flex flex-wrap gap-1.5">
+                          {(s.weakTypes ?? []).map((t) => (
+                            <li key={t} className="rounded-full bg-bad/12 px-2.5 py-0.5 text-sm">
+                              {typeName(t)}
+                            </li>
+                          ))}
+                        </ul>
+                      ) : (
+                        <span className="text-muted">{s.rounds > 0 ? "нет" : "-"}</span>
+                      )}
+                    </td>
                     <td className="px-4 py-3 text-muted">
                       {s.lastActive ? dateFmt.format(new Date(s.lastActive)) : "ещё не играл"}
                     </td>
