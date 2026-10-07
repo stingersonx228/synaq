@@ -8,7 +8,7 @@ import { loadClassDashboard, type ClassDashboard } from "@/lib/teacher";
 
 // The URL carries the teacher secret: keep it out of search engines and Referer headers.
 export const metadata: Metadata = {
-  title: "Панель учителя — Обратный экзамен",
+  title: "Панель учителя | Обратный экзамен",
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };
@@ -20,7 +20,7 @@ export default async function TeacherPanelPage({ params }: PageProps<"/teacher/[
     return (
       <Notice title="База данных не подключена">
         Панель учителя работает только с подключённой базой. Пример панели можно посмотреть на{" "}
-        <Link href="/teacher/demo" className="text-accent underline">
+        <Link href="/teacher/demo" className="text-pen underline">
           демо-странице
         </Link>
         .
@@ -41,7 +41,7 @@ export default async function TeacherPanelPage({ params }: PageProps<"/teacher/[
 function Notice({ title, children }: { title: string; children: ReactNode }) {
   return (
     <main className="mx-auto w-full max-w-2xl px-4 py-16">
-      <h1 className="text-3xl font-bold">{title}</h1>
+      <h1 className="font-display text-3xl font-bold">{title}</h1>
       <p className="mt-4 text-lg leading-relaxed text-muted">{children}</p>
     </main>
   );

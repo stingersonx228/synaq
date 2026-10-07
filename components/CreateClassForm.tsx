@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState, type FormEvent } from "react";
+import { buttonClass } from "./game/ui";
 
 type Created = { name: string; code: string; link: string };
 type State = { kind: "idle" } | { kind: "pending" } | { kind: "error"; message: string } | { kind: "created"; data: Created };
@@ -50,13 +51,13 @@ export default function CreateClassForm() {
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 60))}
           placeholder="Например, 9 «Б», алгебра"
-          className="w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-accent"
+          className="w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-pen"
         />
       </label>
       {state.kind === "error" ? (
         <p className="rounded-xl border border-bad/40 bg-bad/10 px-3 py-2" role="alert">
           {state.message}{" "}
-          <Link href="/teacher/demo" className="text-accent underline">
+          <Link href="/teacher/demo" className="text-pen underline">
             Посмотреть демо-панель
           </Link>
         </p>
@@ -64,7 +65,7 @@ export default function CreateClassForm() {
       <button
         type="submit"
         disabled={!trimmed || state.kind === "pending"}
-        className="min-h-12 rounded-xl bg-accent px-4 py-3 text-lg font-bold text-ink transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-40"
+        className={buttonClass("primary", "w-full text-lg")}
       >
         {state.kind === "pending" ? "Создаём…" : "Создать класс"}
       </button>
@@ -78,7 +79,7 @@ function CreatedClass({ data }: { data: Created }) {
       <div>
         <p className="text-sm font-semibold text-muted">Код класса «{data.name}» для учеников</p>
         <div className="mt-1 flex flex-wrap items-center gap-3">
-          <span className="font-mono text-4xl font-bold tracking-[0.3em] text-accent">{data.code}</span>
+          <span className="font-mono text-4xl font-bold tracking-[0.3em] text-pen">{data.code}</span>
           <CopyButton text={data.code} />
         </div>
         <p className="mt-1 text-muted">Ученики вводят его на главной странице вместе с псевдонимом.</p>
@@ -101,7 +102,7 @@ function CreatedClass({ data }: { data: Created }) {
       </p>
       <a
         href={data.link}
-        className="inline-flex min-h-12 items-center justify-center rounded-xl border border-line bg-panel-2 px-4 text-lg font-semibold hover:border-muted"
+        className={buttonClass("secondary", "text-lg")}
       >
         Открыть панель
       </a>

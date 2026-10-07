@@ -1,38 +1,58 @@
-"use client";
-
+import Link from "next/link";
 import type { ReactNode } from "react";
+import { HeartIcon, RobotIcon, StarIcon } from "@phosphor-icons/react/dist/ssr";
+
+export function Wordmark({ className = "" }: { className?: string }) {
+  return (
+    <Link href="/" className={`font-display text-sm font-bold tracking-tight text-text sm:text-base ${className}`}>
+      Обратный <span className="text-pen">экзамен</span>
+    </Link>
+  );
+}
 
 export function Hearts({ lives, max }: { lives: number; max: number }) {
   return (
-    <span className="inline-flex gap-0.5 text-xl leading-none" aria-label={`Жизни: ${lives} из ${max}`}>
+    <span className="inline-flex items-center gap-1" aria-label={`Жизни: ${lives} из ${max}`} role="img">
       {Array.from({ length: max }, (_, i) => (
-        <span key={i} className={i < lives ? "text-bad" : "text-line"} aria-hidden>
-          ♥
-        </span>
+        <HeartIcon
+          key={i}
+          size={22}
+          weight={i < lives ? "fill" : "regular"}
+          className={i < lives ? "text-bad" : "text-line"}
+          aria-hidden
+        />
       ))}
     </span>
   );
 }
 
-export function Stars({ count, size = "text-xl" }: { count: number; size?: string }) {
+export function Stars({ count, size = 20 }: { count: number; size?: number }) {
   return (
-    <span className={`inline-flex gap-0.5 leading-none ${size}`} aria-label={`Звёзд: ${count} из 3`}>
+    <span className="inline-flex items-center gap-0.5" aria-label={`Звёзд: ${count} из 3`} role="img">
       {[0, 1, 2].map((i) => (
-        <span key={i} className={i < count ? "text-accent" : "text-line"} aria-hidden>
-          ★
-        </span>
+        <StarIcon
+          key={i}
+          size={size}
+          weight={i < count ? "fill" : "regular"}
+          className={i < count ? "text-pen" : "text-line"}
+          aria-hidden
+        />
       ))}
     </span>
   );
 }
 
-export function Panel({ title, children, className = "" }: { title?: ReactNode; children: ReactNode; className?: string }) {
-  return (
-    <section className={`rounded-2xl border border-line bg-panel p-4 sm:p-5 ${className}`}>
-      {title ? <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-muted">{title}</h2> : null}
-      {children}
-    </section>
-  );
+const BUTTON_STYLES = {
+  primary: "bg-pen text-ink hover:brightness-110",
+  good: "bg-good text-ink hover:brightness-110",
+  secondary: "border border-line bg-surface-2 text-text hover:border-muted",
+  ghost: "text-muted hover:bg-surface-2 hover:text-text",
+} as const;
+
+export type ButtonVariant = keyof typeof BUTTON_STYLES;
+
+export function buttonClass(variant: ButtonVariant = "primary", extra = "") {
+  return `inline-flex min-h-12 items-center justify-center gap-2 whitespace-nowrap rounded-xl px-5 font-semibold transition duration-150 active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40 ${BUTTON_STYLES[variant]} ${extra}`;
 }
 
 export function Button({
@@ -45,36 +65,27 @@ export function Button({
 }: {
   children: ReactNode;
   onClick?: () => void;
-  variant?: "primary" | "secondary" | "ghost" | "good";
+  variant?: ButtonVariant;
   disabled?: boolean;
   type?: "button" | "submit";
   className?: string;
 }) {
-  const styles = {
-    primary: "bg-accent text-ink hover:brightness-110",
-    good: "bg-good text-ink hover:brightness-110",
-    secondary: "border border-line bg-panel-2 text-text hover:border-muted",
-    ghost: "text-muted hover:text-text",
-  }[variant];
   return (
-    <button
-      type={type}
-      onClick={onClick}
-      disabled={disabled}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 py-2 font-semibold transition disabled:cursor-not-allowed disabled:opacity-40 ${styles} ${className}`}
-    >
+    <button type={type} onClick={onClick} disabled={disabled} className={buttonClass(variant, className)}>
       {children}
     </button>
   );
 }
 
-export function InternAvatar({ size = "h-9 w-9 text-base" }: { size?: string }) {
+export function InternAvatar({ size = "md" }: { size?: "sm" | "md" | "lg" }) {
+  const box = { sm: "h-8 w-8", md: "h-10 w-10", lg: "h-14 w-14" }[size];
+  const icon = { sm: 18, md: 22, lg: 30 }[size];
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-full bg-intern/15 font-bold text-intern ring-1 ring-intern/40 ${size}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-xl bg-intern/12 text-intern ring-1 ring-intern/30 ${box}`}
       aria-hidden
     >
-      А
+      <RobotIcon size={icon} weight="duotone" />
     </span>
   );
 }

@@ -1,5 +1,5 @@
-import Link from "next/link";
 import type { ReactNode } from "react";
+import { Wordmark } from "@/components/game/ui";
 import type { ClassStats } from "@/lib/stats";
 
 const dateFmt = new Intl.DateTimeFormat("ru-RU", {
@@ -26,22 +26,20 @@ export default function TeacherDashboard({
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
       {demo ? (
-        <div className="mb-6 rounded-2xl border-2 border-accent bg-accent/10 px-5 py-4 text-center" role="note">
-          <p className="text-2xl font-black tracking-wide text-accent">ДЕМО-ДАННЫЕ, не реальные результаты</p>
+        <div className="mb-6 rounded-xl border-2 border-pen bg-pen/10 px-5 py-4 text-center" role="note">
+          <p className="font-display text-xl font-bold text-pen sm:text-2xl">ДЕМО-ДАННЫЕ, не реальные результаты</p>
           <p className="mt-1 text-muted">Класс из 30 вымышленных учеников, сгенерирован для показа панели учителя.</p>
         </div>
       ) : null}
 
       <header className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <Link href="/" className="font-semibold text-accent">
-            Обратный экзамен
-          </Link>
-          <h1 className="mt-1 text-3xl font-bold sm:text-4xl">Класс {name}</h1>
+          <Wordmark />
+          <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Класс {name}</h1>
         </div>
-        <div className="rounded-2xl border border-line bg-panel px-5 py-3 text-right">
+        <div className="rounded-xl border border-line bg-surface px-5 py-3 text-right">
           <p className="text-sm text-muted">Код для учеников</p>
-          <p className="font-mono text-3xl font-bold tracking-[0.25em] text-accent">{code}</p>
+          <p className="font-mono text-3xl font-bold tracking-[0.25em] text-pen">{code}</p>
         </div>
       </header>
 
@@ -52,7 +50,7 @@ export default function TeacherDashboard({
 
       {stats.studentCount === 0 ? (
         <Empty>
-          Пока никто не вошёл. Дайте ученикам код <b className="font-mono text-accent">{code}</b>: они вводят его на
+          Пока никто не вошёл. Дайте ученикам код <b className="font-mono text-pen">{code}</b>: они вводят его на
           главной странице вместе с псевдонимом.
         </Empty>
       ) : stats.roundCount === 0 ? (
@@ -60,13 +58,13 @@ export default function TeacherDashboard({
       ) : (
         <>
           <section className="mt-8">
-            <h2 className="text-xl font-bold">Главные слепые пятна класса</h2>
+            <h2 className="font-display text-xl font-bold">Главные слепые пятна класса</h2>
             {stats.blindSpots.length === 0 ? (
               <p className="mt-2 text-muted">Слепых пятен нет: класс находит все типы ошибок.</p>
             ) : (
               <ol className="mt-3 grid gap-4 md:grid-cols-3">
                 {stats.blindSpots.map((t, i) => (
-                  <li key={t.typeId} className="rounded-2xl border border-bad/40 bg-bad/10 p-5">
+                  <li key={t.typeId} className="rounded-xl border border-bad/40 bg-bad/10 p-5">
                     <p className="text-sm font-semibold text-muted">№ {i + 1}</p>
                     <p className="mt-1 text-xl font-bold leading-snug">{t.name}</p>
                     <p className="mt-3 text-5xl font-black text-bad">{pct(t.problemRate)}</p>
@@ -80,13 +78,13 @@ export default function TeacherDashboard({
           </section>
 
           <section className="mt-10">
-            <h2 className="text-xl font-bold">Какие типы ошибок класс не заметил</h2>
+            <h2 className="font-display text-xl font-bold">Какие типы ошибок класс не заметил</h2>
             <p className="mt-1 text-sm text-muted">
-              Проблемный раунд — ошибку не нашли или не доказали, потеряли жизнь или открыли все 3 подсказки.
+              Проблемный раунд: ошибку не нашли или не доказали, потеряли жизнь или открыли все 3 подсказки.
             </p>
-            <div className="mt-3 overflow-x-auto rounded-2xl border border-line">
+            <div className="mt-3 overflow-x-auto rounded-xl border border-line">
               <table className="w-full min-w-[640px] text-left">
-                <thead className="bg-panel text-sm text-muted">
+                <thead className="bg-surface text-sm text-muted">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Тип ошибки</th>
                     <th className="px-4 py-3 font-semibold">Проблемных</th>
@@ -102,7 +100,7 @@ export default function TeacherDashboard({
                       <td className="px-4 py-3 font-medium">{t.name}</td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
-                          <div className="h-2.5 w-28 overflow-hidden rounded-full bg-panel-2" aria-hidden>
+                          <div className="h-2.5 w-28 overflow-hidden rounded-full bg-surface-2" aria-hidden>
                             <div className="h-full rounded-full bg-bad" style={{ width: pct(t.problemRate) }} />
                           </div>
                           <span className="w-12 tabular-nums">{pct(t.problemRate)}</span>
@@ -123,10 +121,10 @@ export default function TeacherDashboard({
 
       {stats.studentCount > 0 ? (
         <section className="mt-10">
-          <h2 className="text-xl font-bold">Ученики</h2>
-          <div className="mt-3 overflow-x-auto rounded-2xl border border-line">
+          <h2 className="font-display text-xl font-bold">Ученики</h2>
+          <div className="mt-3 overflow-x-auto rounded-xl border border-line">
             <table className="w-full min-w-[520px] text-left">
-              <thead className="bg-panel text-sm text-muted">
+              <thead className="bg-surface text-sm text-muted">
                 <tr>
                   <th className="px-4 py-3 font-semibold">Псевдоним</th>
                   <th className="px-4 py-3 text-right font-semibold">Раундов</th>
@@ -139,7 +137,7 @@ export default function TeacherDashboard({
                   <tr key={s.nickname} className="border-t border-line">
                     <td className="px-4 py-3 font-medium">{s.nickname}</td>
                     <td className="px-4 py-3 text-right tabular-nums">{s.rounds}</td>
-                    <td className="px-4 py-3 text-right tabular-nums">{s.rounds > 0 ? s.avgScore : "—"}</td>
+                    <td className="px-4 py-3 text-right tabular-nums">{s.rounds > 0 ? s.avgScore : "-"}</td>
                     <td className="px-4 py-3 text-muted">
                       {s.lastActive ? dateFmt.format(new Date(s.lastActive)) : "ещё не играл"}
                     </td>
@@ -156,7 +154,7 @@ export default function TeacherDashboard({
 
 function Metric({ label, value }: { label: string; value: number }) {
   return (
-    <div className="rounded-2xl border border-line bg-panel px-5 py-4">
+    <div className="rounded-xl border border-line bg-surface px-5 py-4">
       <p className="text-sm text-muted">{label}</p>
       <p className="text-4xl font-bold tabular-nums">{value}</p>
     </div>
@@ -164,5 +162,5 @@ function Metric({ label, value }: { label: string; value: number }) {
 }
 
 function Empty({ children }: { children: ReactNode }) {
-  return <p className="mt-8 rounded-2xl border border-dashed border-line bg-panel px-5 py-8 text-lg leading-relaxed">{children}</p>;
+  return <p className="mt-8 rounded-xl border border-dashed border-line bg-surface px-5 py-8 text-lg leading-relaxed">{children}</p>;
 }

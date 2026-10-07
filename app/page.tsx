@@ -1,74 +1,128 @@
 import Link from "next/link";
+import { ArrowRightIcon, ChalkboardTeacherIcon } from "@phosphor-icons/react/dist/ssr";
 import JoinForm from "@/components/JoinForm";
-import { InternAvatar } from "@/components/game/ui";
+import SolutionSheet from "@/components/game/SolutionSheet";
+import { buttonClass, InternAvatar, Wordmark } from "@/components/game/ui";
+import { getCase } from "@/lib/catalog";
 
-const STEPS = [
-  ["Найди строку", "Алибек решил задачу и где-то ошибся. Нажми на неверную строку — или скажи, что ошибок нет."],
-  ["Объясни причину", "Напиши, что именно он сделал не так. Алибек будет спорить — он уверен в себе."],
-  ["Докажи числом", "Подбери контрпример. Проверку делает математика, а не ИИ: если доказательство верное, Алибек сдаётся."],
+const PREVIEW = getCase("pct-01")!;
+
+const FLOW = [
+  ["Найди", "Нажми на строку, где Алибек ошибся. Или докажи, что ошибок нет: иногда он прав."],
+  ["Объясни", "Напиши, что именно не так. Алибек будет спорить: он уверен в себе."],
+  ["Докажи", "Подбери число-контрпример. Проверяет математика, а не ИИ, поэтому сдача честная."],
 ] as const;
 
 export default function Home() {
   return (
-    <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16">
-      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
-        <section>
-          <p className="font-semibold text-accent">Обратный экзамен</p>
-          <h1 className="mt-2 text-4xl font-bold leading-tight sm:text-5xl">
-            Теперь ты проверяешь ИИ, а не он тебя.
-          </h1>
-          <p className="mt-4 text-xl leading-relaxed text-muted">
-            ИИ-стажёр Алибек решает задачи по алгебре и делает ошибки новичка. Найди ошибку, объясни её и докажи —
-            так готовятся к ЕНТ без страха ошибиться.
-          </p>
+    <div className="flex min-h-[100dvh] flex-col">
+      <header className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4">
+        <Wordmark />
+        <Link href="/teacher" className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-text">
+          <ChalkboardTeacherIcon size={18} aria-hidden />
+          Учителю
+        </Link>
+      </header>
 
-          <div className="mt-6 flex items-start gap-3 rounded-2xl border border-line bg-panel p-4">
-            <InternAvatar size="h-10 w-10 text-lg" />
-            <p className="text-lg leading-snug">
-              «Я всё решил правильно. Скидки складываются, корень из 9 — это 3. Можешь проверить, но ошибок не
-              найдёшь».
+      <main className="flex-1">
+        <section className="mx-auto grid w-full max-w-7xl grid-cols-1 items-center gap-12 px-4 pb-16 pt-10 lg:grid-cols-[1fr_1.05fr] lg:gap-16 lg:pt-16 [&>*]:min-w-0">
+          <div>
+            <h1 className="font-display text-4xl font-bold leading-[1.1] tracking-tight sm:text-5xl xl:text-6xl">
+              ИИ ошибся.
+              <br />
+              <span className="text-pen">Докажи это.</span>
+            </h1>
+            <p className="mt-6 max-w-[34ch] text-xl leading-relaxed text-muted">
+              Стажёр Алибек решает задачи по алгебре и уверен, что прав. Найди ошибку и опровергни её числом.
             </p>
+            <div className="mt-8 flex flex-wrap gap-3">
+              <Link href="/play" className={buttonClass("primary", "text-lg")}>
+                Играть
+                <ArrowRightIcon size={20} weight="bold" aria-hidden />
+              </Link>
+              <a href="#join" className={buttonClass("secondary", "text-lg")}>
+                Войти по коду класса
+              </a>
+            </div>
           </div>
 
-          <ol className="mt-8 flex flex-col gap-4">
-            {STEPS.map(([title, text], i) => (
-              <li key={title} className="flex gap-4">
-                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-accent/15 font-bold text-accent">
-                  {i + 1}
-                </span>
-                <div>
-                  <p className="text-lg font-semibold">{title}</p>
-                  <p className="text-muted">{text}</p>
-                </div>
+          <figure className="relative" aria-label="Пример раунда">
+            <div className="rounded-xl border border-line bg-surface p-3 shadow-[0_30px_80px_-30px_rgb(255_106_61/0.25)] sm:p-4">
+              <p className="px-2 pb-2 pt-1 text-muted sm:px-3">{PREVIEW.task}</p>
+              <SolutionSheet
+                steps={PREVIEW.steps}
+                answer={PREVIEW.answer}
+                lineState={(n) => (n === 2 ? "marked" : "idle")}
+                compact
+              />
+            </div>
+            <figcaption className="relative -mt-5 ml-auto mr-3 flex max-w-xs items-start gap-3 sm:mr-6">
+              <InternAvatar />
+              <p className="rounded-xl rounded-tl-sm bg-surface-2 px-4 py-2.5 leading-snug ring-1 ring-line">
+                {PREVIEW.bug!.defense[0]}
+              </p>
+            </figcaption>
+          </figure>
+        </section>
+
+        <section className="border-y border-line bg-surface/60">
+          <ol className="mx-auto grid w-full max-w-7xl grid-cols-1 divide-y divide-line px-4 md:grid-cols-3 md:divide-x md:divide-y-0">
+            {FLOW.map(([verb, text], i) => (
+              <li key={verb} className={`py-8 md:py-12 ${i === 0 ? "md:pr-10" : i === 1 ? "md:px-10" : "md:pl-10"}`}>
+                <h2 className="font-display text-3xl font-bold">
+                  {verb}
+                  <span className="text-pen">.</span>
+                </h2>
+                <p className="mt-3 max-w-[38ch] text-lg leading-relaxed text-muted">{text}</p>
               </li>
             ))}
           </ol>
         </section>
 
-        <section className="rounded-2xl border border-line bg-panel p-5 sm:p-6">
-          <h2 className="mb-4 text-2xl font-bold">Войти в класс</h2>
-          <JoinForm />
-          <div className="my-5 flex items-center gap-3 text-sm text-muted">
-            <span className="h-px flex-1 bg-line" />
-            или
-            <span className="h-px flex-1 bg-line" />
+        <section
+          id="join"
+          className="mx-auto grid w-full max-w-7xl scroll-mt-8 grid-cols-1 gap-10 px-4 py-20 lg:grid-cols-[1fr_28rem] [&>*]:min-w-0"
+        >
+          <div>
+            <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">Играешь с классом?</h2>
+            <p className="mt-4 max-w-[46ch] text-lg leading-relaxed text-muted">
+              Введи код от учителя и придумай псевдоним. Учитель увидит, какие ошибки класс пропускает, но не твоё
+              настоящее имя: его мы не спрашиваем.
+            </p>
+            <p className="mt-4 max-w-[46ch] text-lg leading-relaxed text-muted">
+              Без кода тоже можно играть. Тогда результат останется только на этом устройстве.
+            </p>
           </div>
-          <Link
-            href="/play"
-            className="flex min-h-12 items-center justify-center rounded-xl border border-line bg-panel-2 px-4 text-lg font-semibold hover:border-muted"
-          >
-            Играть без регистрации
-          </Link>
-          <p className="mt-3 text-center text-sm text-muted">Прогресс сохранится только на этом устройстве.</p>
+          <div className="rounded-xl border border-line bg-surface p-5 sm:p-6">
+            <JoinForm />
+          </div>
         </section>
-      </div>
 
-      <footer className="mt-16 flex flex-wrap items-center justify-between gap-4 border-t border-line pt-6 text-muted">
-        <Link href="/teacher" className="font-semibold text-text hover:text-accent">
-          Я учитель →
-        </Link>
-        <span className="text-sm">Без рекламы и трекеров. Настоящие имена не собираем.</span>
+        <section className="border-t border-line">
+          <div className="mx-auto flex w-full max-w-7xl flex-col gap-6 px-4 py-14 md:flex-row md:items-center md:justify-between">
+            <div>
+              <h2 className="font-display text-2xl font-bold">Для учителя</h2>
+              <p className="mt-2 max-w-[52ch] text-lg text-muted">
+                Создайте класс за минуту и смотрите, какие типы ошибок ученики не замечают.
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-3">
+              <Link href="/teacher" className={buttonClass("secondary")}>
+                Создать класс
+              </Link>
+              <Link href="/teacher/demo" className={buttonClass("ghost")}>
+                Пример панели
+              </Link>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer className="border-t border-line">
+        <p className="mx-auto w-full max-w-7xl px-4 py-6 text-sm text-muted">
+          Без рекламы и трекеров. Объяснения учеников не сохраняются.
+        </p>
       </footer>
-    </main>
+    </div>
   );
 }

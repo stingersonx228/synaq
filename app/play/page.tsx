@@ -3,7 +3,7 @@ import PlayClient from "@/components/game/PlayClient";
 import { getCase } from "@/lib/catalog";
 
 export const metadata: Metadata = {
-  title: "Игра — Обратный экзамен",
+  title: "Игра | Обратный экзамен",
 };
 
 export default async function PlayPage({ searchParams }: PageProps<"/play">) {

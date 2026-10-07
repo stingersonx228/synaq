@@ -14,7 +14,9 @@
 - The attempt score is recomputed on the server; the client never sends it.
 - Joining with an existing nickname in the same class returns the same student (lets a student continue on another device).
 - "Запасной стажёр" swaps to an unused case of the same kind (clean/buggy) when available, without penalty.
-- System font stack instead of next/font to keep builds working without network access.
+- UI redesign ("red pen on someone else's exam"): one accent color, Unbounded for headings, Geist for text, JetBrains Mono for line numbers and numbers, all via next/font (self-hosted at build time; the build needs network access to Google Fonts). Unbounded is loaded as a variable font because explicit weights break the Turbopack build.
+- Icons: @phosphor-icons/react (SSR entry), no hand-drawn SVG.
+- Dark theme only, as the spec requires a dark default and the main use is a stage projector.
 - Supabase migration was not applied: the connected project's DB timed out and the other projects in the account are unrelated.
 - Request bodies are capped at 4 KB (413). Per-IP anti-spam windows in memory: join 120/10 min (a class shares one school IP), class creation 10/hour, dashboard reads 120/10 min.
 - `llm_calls` rows older than 2 hours are pruned opportunistically (2% of inserts).

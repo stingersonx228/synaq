@@ -26,7 +26,7 @@ export const TYPE_NAMES: Record<string, string> = {
   ineq_sign: "Неравенства: деление на минус",
   percent_symmetric: "Проценты: «+50% и −50%»",
   lost_root: "Потерянный корень",
-  clean: "Верное решение: ложная тревога",
+  clean: "Решение без ошибки",
 };
 
 export function typeName(typeId: string): string {
@@ -36,24 +36,19 @@ export function typeName(typeId: string): string {
 /** Fixed intern lines that never come from the LLM. */
 export const INTERN_LINES = {
   greeting: "Привет! Я Алибек, стажёр. Задачу уже решил, всё точно верно. Можешь проверить, но ошибок не найдёшь.",
-  wrongLine: (step: number) => `В строке ${step} у меня всё верно. Можешь пересчитать — сойдётся.`,
+  wrongLine: (step: number) => `В строке ${step} у меня всё верно. Можешь пересчитать, всё сойдётся.`,
   missedBug: "Вот и я говорю: всё идеально!",
   cleanWin: "Вот видишь, я же говорил. Спасибо, что проверил каждую строку честно.",
-  askProof: "Слова — это слова. Докажи на числах.",
   proofFailed: {
     invalid_input: "Ну и что это за число? Давай нормальное.",
     undefined: "Так нечестно, тут вообще ничего не посчитать.",
     values_equal: "Вот видишь, получилось одно и то же. Мой способ работает.",
     claim_false: "Это вообще не мой ответ. Ты проверяешь что-то своё.",
-    original_holds: "Подставил — всё сходится. Я же говорил!",
+    original_holds: "Подставил, всё сходится. Я же говорил!",
     not_a_solution: "Это число к уравнению не подходит. Мимо.",
     already_claimed: "Так это число у меня и так есть в ответе.",
     unknown_mode: "Не понимаю, что ты проверяешь.",
   } satisfies Record<RefuteFailReason, string>,
-  stubborn: [
-    "Всё равно не убедил. Я это уже проверил.",
-    "У нас в команде так всегда делают. Попробуй ещё.",
-  ],
 } as const;
 
 /** Lowercase, collapse whitespace, unify minus/dash characters. */
