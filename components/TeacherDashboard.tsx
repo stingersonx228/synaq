@@ -1,5 +1,6 @@
 import type { ReactNode } from "react";
 import { Wordmark } from "@/components/game/ui";
+import { plural } from "@/lib/plural";
 import type { ClassStats } from "@/lib/stats";
 
 const dateFmt = new Intl.DateTimeFormat("ru-RU", {
@@ -43,10 +44,13 @@ export default function TeacherDashboard({
         </div>
       </header>
 
-      <div className="mt-6 grid grid-cols-2 gap-4 sm:max-w-md">
-        <Metric label="Учеников" value={stats.studentCount} />
-        <Metric label="Раундов сыграно" value={stats.roundCount} />
-      </div>
+      <p className="mt-4 text-lg text-muted">
+        <span className="font-mono font-semibold text-text">{stats.studentCount}</span>{" "}
+        {plural(stats.studentCount, ["ученик", "ученика", "учеников"])}{" "}
+        {plural(stats.studentCount, ["сыграл", "сыграли", "сыграли"])}{" "}
+        <span className="font-mono font-semibold text-text">{stats.roundCount}</span>{" "}
+        {plural(stats.roundCount, ["раунд", "раунда", "раундов"])}
+      </p>
 
       {stats.studentCount === 0 ? (
         <Empty>
@@ -62,15 +66,19 @@ export default function TeacherDashboard({
             {stats.blindSpots.length === 0 ? (
               <p className="mt-2 text-muted">Слепых пятен нет: класс находит все типы ошибок.</p>
             ) : (
-              <ol className="mt-3 grid gap-4 md:grid-cols-3">
+              <ol className="mt-4 divide-y divide-line border-y border-line">
                 {stats.blindSpots.map((t, i) => (
-                  <li key={t.typeId} className="rounded-xl border border-bad/40 bg-bad/10 p-5">
-                    <p className="text-sm font-semibold text-muted">№ {i + 1}</p>
-                    <p className="mt-1 text-xl font-bold leading-snug">{t.name}</p>
-                    <p className="mt-3 text-5xl font-black text-bad">{pct(t.problemRate)}</p>
-                    <p className="mt-1 text-sm text-muted">
-                      проблемных раундов ({t.problemRounds} из {t.rounds})
-                    </p>
+                  <li key={t.typeId} className="grid grid-cols-[2rem_1fr_auto] items-baseline gap-x-4 gap-y-1 py-4 sm:py-5">
+                    <span className="font-mono text-lg text-muted">{i + 1}</span>
+                    <span className="text-xl font-semibold leading-snug sm:text-2xl">{t.name}</span>
+                    <span className="text-right">
+                      <span className="block font-display text-3xl font-bold text-bad sm:text-4xl">
+                        {pct(t.problemRate)}
+                      </span>
+                      <span className="text-sm text-muted">
+                        {t.problemRounds} из {t.rounds}
+                      </span>
+                    </span>
                   </li>
                 ))}
               </ol>
@@ -152,14 +160,6 @@ export default function TeacherDashboard({
   );
 }
 
-function Metric({ label, value }: { label: string; value: number }) {
-  return (
-    <div className="rounded-xl border border-line bg-surface px-5 py-4">
-      <p className="text-sm text-muted">{label}</p>
-      <p className="text-4xl font-bold tabular-nums">{value}</p>
-    </div>
-  );
-}
 
 function Empty({ children }: { children: ReactNode }) {
   return <p className="mt-8 rounded-xl border border-dashed border-line bg-surface px-5 py-8 text-lg leading-relaxed">{children}</p>;

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowCounterClockwiseIcon, CheckIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { SESSION_LIVES, typeName } from "@/lib/catalog";
+import { plural } from "@/lib/plural";
 import { blindSpots, stars } from "@/lib/scoring";
 import type { StudentIdentity } from "@/lib/session";
 import type { GameState } from "./model";
@@ -41,7 +42,9 @@ export default function Summary({
             <p className="text-lg text-muted">{game.lives > 0 ? "Сессия завершена" : "Жизни закончились"}</p>
             <h1 className="mt-2 font-display text-6xl font-bold tabular-nums sm:text-7xl">
               {game.total}
-              <span className="ml-3 align-middle text-2xl font-medium text-muted sm:text-3xl">очков</span>
+              <span className="ml-3 align-middle text-2xl font-medium text-muted sm:text-3xl">
+                {plural(game.total, ["очко", "очка", "очков"])}
+              </span>
             </h1>
           </div>
           <div className="flex flex-wrap items-center gap-5 text-lg">
@@ -54,29 +57,26 @@ export default function Summary({
           </div>
         </div>
 
-        <ol className="mt-10 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <ol className="mt-10 divide-y divide-line rounded-xl border border-line bg-surface">
           {game.results.map((r, i) => {
             const won = r.outcome === "solved";
             return (
               <li
                 key={`${r.caseId}-${i}`}
-                className={`rise flex items-start justify-between gap-3 rounded-xl border bg-surface p-4 ${
-                  won ? "border-line" : "border-bad/40"
-                }`}
-                style={{ animationDelay: `${i * 60}ms` }}
+                className="rise grid grid-cols-[1.75rem_1.5rem_1fr_auto] items-center gap-3 px-4 py-3 sm:px-5"
+                style={{ animationDelay: `${i * 50}ms` }}
               >
-                <div className="flex gap-3">
-                  {won ? (
-                    <CheckIcon size={20} weight="bold" className="mt-0.5 shrink-0 text-good" aria-label="Решено" />
-                  ) : (
-                    <XIcon size={20} weight="bold" className="mt-0.5 shrink-0 text-bad" aria-label="Не решено" />
-                  )}
-                  <span className="leading-snug">{typeName(r.typeId)}</span>
-                </div>
-                <div className="flex shrink-0 flex-col items-end gap-1">
-                  <Stars count={r.stars} size={16} />
-                  <span className="font-mono text-sm tabular-nums text-muted">{r.score}</span>
-                </div>
+                <span className="font-mono text-muted tabular-nums">{i + 1}</span>
+                {won ? (
+                  <CheckIcon size={20} weight="bold" className="text-good" aria-label="Решено" />
+                ) : (
+                  <XIcon size={20} weight="bold" className="text-bad" aria-label="Не решено" />
+                )}
+                <span className="min-w-0 text-lg leading-snug">{typeName(r.typeId)}</span>
+                <span className="flex items-center gap-3">
+                  <Stars count={r.stars} size={18} />
+                  <span className="w-10 text-right font-mono tabular-nums">{r.score}</span>
+                </span>
               </li>
             );
           })}

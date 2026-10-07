@@ -12,6 +12,8 @@
   --color-line: #272c38;
   --color-text: #edeff4;
   --color-muted: #9098ab;
+  /* Empty hearts/stars and other non-text state marks: at least 3:1 on every surface. */
+  --color-faint: #646b7e;
   --color-pen: #ff6a3d;
   --color-good: #34d399;
   --color-bad: #f05656;
@@ -37,6 +39,18 @@ html {
   html {
     font-size: 18px;
   }
+}
+
+h1,
+h2,
+h3 {
+  text-wrap: balance;
+}
+
+p,
+li,
+dd {
+  text-wrap: pretty;
 }
 
 body {
@@ -84,7 +98,7 @@ body {
 
 @keyframes rise {
   from {
-    opacity: 0;
+    opacity: 0.55;
     transform: translateY(8px);
   }
   to {

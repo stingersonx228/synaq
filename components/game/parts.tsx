@@ -72,7 +72,16 @@ function RoundTrack({ game }: { game: GameState }) {
           : i === game.index
             ? "bg-pen"
             : "bg-line";
-        return <li key={`${id}-${i}`} className={`h-1.5 w-7 rounded-full transition-colors duration-300 ${tone}`} />;
+        const label = result
+          ? `Раунд ${i + 1}: ${result.outcome === "solved" ? "выигран" : "проигран"}`
+          : i === game.index
+            ? `Раунд ${i + 1}: идёт`
+            : `Раунд ${i + 1}: впереди`;
+        return (
+          <li key={`${id}-${i}`} title={label} className={`h-1.5 w-7 rounded-full transition-colors duration-300 ${tone}`}>
+            <span className="sr-only">{label}</span>
+          </li>
+        );
       })}
     </ol>
   );
@@ -98,7 +107,7 @@ export function PhaseSteps({ phase }: { phase: Phase }) {
             key={p}
             aria-current={active ? "step" : undefined}
             className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors duration-300 sm:text-base ${
-              active ? "border-pen bg-pen/10 text-text" : done ? "border-line text-muted" : "border-line/60 text-muted/60"
+              active ? "border-pen bg-pen/10 text-text" : done ? "border-line text-muted" : "border-line/50 text-muted"
             }`}
           >
             {done ? (
@@ -176,9 +185,9 @@ export function InternPanel({
               type="button"
               onClick={onHint}
               disabled={hintsDisabled}
-              className="rounded-xl border border-line px-3 py-1.5 text-sm font-medium transition hover:border-muted active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
+              className="min-h-11 rounded-xl border border-line px-3 text-sm font-medium transition hover:border-muted active:scale-[0.98] disabled:pointer-events-none disabled:opacity-40"
             >
-              Открыть {hintsUsed + 1}-ю <span className="font-mono text-bad">−{SCORE.hintCost[hintsUsed]}</span>
+              Открыть подсказку <span className="font-mono text-bad">−{SCORE.hintCost[hintsUsed]}</span>
             </button>
           ) : (
             <span className="text-sm text-muted">все открыты</span>
@@ -299,7 +308,7 @@ export function ExplainForm({
           if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) submit(e);
         }}
         placeholder="Например: он посчитал… а надо…"
-        className="w-full resize-none rounded-xl border border-line bg-ink px-4 py-3 text-lg outline-none transition placeholder:text-muted/60 focus:border-pen"
+        className="w-full resize-none rounded-xl border border-line bg-ink px-4 py-3 text-lg outline-none transition placeholder:text-muted focus:border-pen"
       />
       <div className="flex flex-wrap items-center justify-between gap-3">
         <span className={`font-mono text-sm tabular-nums ${len > 0 && len < EXPLAIN_MIN ? "text-bad" : "text-muted"}`}>
@@ -308,7 +317,7 @@ export function ExplainForm({
         </span>
         <Button type="submit" disabled={!ok || disabled}>
           <PaperPlaneRightIcon size={18} weight="fill" aria-hidden />
-          Отправить
+          Отправить Алибеку
         </Button>
       </div>
     </form>
@@ -369,7 +378,7 @@ export function ProofForm({
           {tries === 0 ? <span>с первой +{SCORE.firstTry}</span> : null}
         </span>
         <Button type="submit" disabled={disabled}>
-          Проверить
+          Проверить доказательство
         </Button>
       </div>
     </form>

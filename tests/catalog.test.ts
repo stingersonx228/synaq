@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { evaluate } from "mathjs";
+import { evaluate } from "mathjs/number";
 import { checkRefutation } from "../lib/refute";
 import {
   CASES,

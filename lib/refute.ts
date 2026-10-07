@@ -1,4 +1,4 @@
-import { evaluate } from "mathjs";
+import { evaluate } from "mathjs/number";
 import type { RefuteSpec, Values } from "./types";
 
 const EPS = 1e-9;

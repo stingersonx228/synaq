@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { plural } from "../lib/plural";
 import { blindSpots, hintPenalty, roundScore, stars } from "../lib/scoring";
 
 const solved = { outcome: "solved" as const, clean: false, causeOk: false, refuteTries: 2, hintsUsed: 0 };
@@ -68,5 +69,25 @@ describe("blindSpots", () => {
         { typeId: "clean", outcome: "false_accusation", hintsUsed: 0 },
       ]),
     ).toEqual(["percent_add", "lost_root", "clean"]);
+  });
+});
+
+describe("plural", () => {
+  const forms: [string, string, string] = ["очко", "очка", "очков"];
+  it.each([
+    [0, "очков"],
+    [1, "очко"],
+    [2, "очка"],
+    [4, "очка"],
+    [5, "очков"],
+    [11, "очков"],
+    [12, "очков"],
+    [21, "очко"],
+    [22, "очка"],
+    [111, "очков"],
+    [358, "очков"],
+    [101, "очко"],
+  ])("%i → %s", (n, expected) => {
+    expect(plural(n, forms)).toBe(expected);
   });
 });

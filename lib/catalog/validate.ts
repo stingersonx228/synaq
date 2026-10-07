@@ -1,4 +1,4 @@
-import { evaluate } from "mathjs";
+import { evaluate } from "mathjs/number";
 import { checkRefutation } from "../refute";
 import type { Case } from "../types";
 import { compactAnswer, TYPE_NAMES } from "./index";

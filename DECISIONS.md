@@ -20,3 +20,6 @@
 - Supabase migration was not applied: the connected project's DB timed out and the other projects in the account are unrelated.
 - Request bodies are capped at 4 KB (413). Per-IP anti-spam windows in memory: join 120/10 min (a class shares one school IP), class creation 10/hour, dashboard reads 120/10 min.
 - `llm_calls` rows older than 2 hours are pruned opportunistically (2% of inserts).
+- Proof checks use the number-only mathjs build (`mathjs/number`): the game chunk drops from 691 KB to 424 KB. Square roots of negatives give NaN instead of a complex number; both are "not a finite number" for the checker, and all catalog demos/decoys and tests behave identically.
+- Design audit fixes: muted text never below 4.5:1 (no translucent muted text), `--color-faint` for empty hearts/stars (≥3:1), 44px minimum touch targets, non-selectable solution lines are plain text instead of disabled buttons, reveal animations start from a visible state, Russian plural forms for counts.
+- Russian dashes inside catalog content (tasks, intern lines) stay: they are grammar, not decoration. UI copy avoids them.

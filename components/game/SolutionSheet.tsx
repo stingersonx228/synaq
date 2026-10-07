@@ -30,33 +30,45 @@ export default function SolutionSheet({
           const n = i + 1;
           const state = lineState(n);
           const clickable = interactive && state === "idle";
+          const rowClass = `group relative grid w-full grid-cols-[2.25rem_1fr_auto] items-start gap-3 rounded-xl px-2 ${
+            compact ? "py-2" : "py-3"
+          } text-left transition duration-150 sm:px-3 ${
+            clickable ? "cursor-pointer hover:bg-surface-2 active:scale-[0.995]" : ""
+          } ${state === "cleared" ? "shake" : ""}`;
+          const content = (
+            <>
+              <span
+                className={`pt-0.5 text-right font-mono text-base tabular-nums ${
+                  state === "marked" || state === "bug" ? "text-pen" : "text-muted"
+                }`}
+              >
+                {n}
+              </span>
+              <span
+                className={`${compact ? "text-base sm:text-lg" : "text-lg sm:text-xl"} leading-relaxed ${
+                  state === "marked" || state === "bug" ? "pen-mark" : ""
+                } ${state === "cleared" ? "text-muted line-through decoration-muted/60" : ""}`}
+              >
+                {text}
+              </span>
+              <LineTag state={state} clickable={clickable} />
+            </>
+          );
+          // Only selectable lines are buttons; everything else is plain text for screen readers.
           return (
             <li key={n}>
-              <button
-                type="button"
-                onClick={clickable ? () => onPick?.(n) : undefined}
-                disabled={!clickable}
-                aria-label={clickable ? `Строка ${n}: отметить как ошибку` : undefined}
-                className={`group relative grid w-full grid-cols-[2.25rem_1fr_auto] items-start gap-3 rounded-xl px-2 ${compact ? "py-2" : "py-3"} text-left transition duration-150 sm:px-3 ${
-                  clickable ? "cursor-pointer hover:bg-surface-2 active:scale-[0.995]" : "cursor-default"
-                } ${state === "cleared" ? "shake" : ""}`}
-              >
-                <span
-                  className={`pt-0.5 text-right font-mono text-base tabular-nums ${
-                    state === "marked" || state === "bug" ? "text-pen" : "text-muted/70"
-                  }`}
+              {clickable ? (
+                <button
+                  type="button"
+                  onClick={() => onPick?.(n)}
+                  aria-label={`Строка ${n}: ${text}. Отметить как ошибку`}
+                  className={rowClass}
                 >
-                  {n}
-                </span>
-                <span
-                  className={`${compact ? "text-base sm:text-lg" : "text-lg sm:text-xl"} leading-relaxed ${
-                    state === "marked" || state === "bug" ? "pen-mark" : ""
-                  } ${state === "cleared" ? "text-muted line-through decoration-muted/60" : ""}`}
-                >
-                  {text}
-                </span>
-                <LineTag state={state} clickable={clickable} />
-              </button>
+                  {content}
+                </button>
+              ) : (
+                <div className={rowClass}>{content}</div>
+              )}
             </li>
           );
         })}

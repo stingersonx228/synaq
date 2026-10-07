@@ -125,7 +125,7 @@ function CopyButton({ text }: { text: string }) {
     <button
       type="button"
       onClick={copy}
-      className="min-h-10 shrink-0 rounded-xl border border-line px-3 font-semibold hover:border-muted"
+      className="min-h-11 shrink-0 rounded-xl border border-line px-4 font-semibold transition hover:border-muted active:scale-[0.98]"
     >
       {copied ? "Скопировано" : "Копировать"}
     </button>

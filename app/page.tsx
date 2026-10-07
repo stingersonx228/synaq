@@ -18,7 +18,7 @@ export default function Home() {
     <div className="flex min-h-[100dvh] flex-col">
       <header className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4">
         <Wordmark />
-        <Link href="/teacher" className="inline-flex items-center gap-2 text-sm font-medium text-muted hover:text-text">
+        <Link href="/teacher" className="-mr-3 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 text-sm font-medium text-muted transition hover:bg-surface-2 hover:text-text">
           <ChalkboardTeacherIcon size={18} aria-hidden />
           Учителю
         </Link>
@@ -37,7 +37,7 @@ export default function Home() {
             </p>
             <div className="mt-8 flex flex-wrap gap-3">
               <Link href="/play" className={buttonClass("primary", "text-lg")}>
-                Играть
+                Начать игру
                 <ArrowRightIcon size={20} weight="bold" aria-hidden />
               </Link>
               <a href="#join" className={buttonClass("secondary", "text-lg")}>
@@ -111,7 +111,7 @@ export default function Home() {
                 Создать класс
               </Link>
               <Link href="/teacher/demo" className={buttonClass("ghost")}>
-                Пример панели
+                Посмотреть пример панели
               </Link>
             </div>
           </div>

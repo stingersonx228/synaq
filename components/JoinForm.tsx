@@ -11,7 +11,7 @@ const NICK_MIN = 2;
 const NICK_MAX = 24;
 
 const inputClass =
-  "w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none transition placeholder:text-muted/60 focus:border-pen";
+  "w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none transition placeholder:text-muted focus:border-pen";
 
 export default function JoinForm() {
   const router = useRouter();
@@ -86,7 +86,7 @@ export default function JoinForm() {
         </p>
       ) : null}
       <button type="submit" disabled={!valid || pending} className={buttonClass("primary", "w-full text-lg")}>
-        {pending ? "Входим…" : "Войти"}
+        {pending ? "Входим…" : "Войти в класс"}
       </button>
     </form>
   );

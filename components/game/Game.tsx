@@ -285,7 +285,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
                 <button
                   type="button"
                   onClick={swapIntern}
-                  className="-mt-1 inline-flex shrink-0 items-center gap-1.5 rounded-xl px-3 py-1.5 text-sm text-muted transition hover:bg-surface-2 hover:text-text active:scale-[0.98]"
+                  className="-mt-2 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-text active:scale-[0.98]"
                   title="Мгновенно заменить задачу на другую из каталога"
                 >
                   <ArrowsClockwiseIcon size={16} aria-hidden />

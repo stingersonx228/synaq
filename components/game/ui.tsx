@@ -18,7 +18,7 @@ export function Hearts({ lives, max }: { lives: number; max: number }) {
           key={i}
           size={22}
           weight={i < lives ? "fill" : "regular"}
-          className={i < lives ? "text-bad" : "text-line"}
+          className={i < lives ? "text-bad" : "text-faint"}
           aria-hidden
         />
       ))}
@@ -34,7 +34,7 @@ export function Stars({ count, size = 20 }: { count: number; size?: number }) {
           key={i}
           size={size}
           weight={i < count ? "fill" : "regular"}
-          className={i < count ? "text-pen" : "text-line"}
+          className={i < count ? "text-pen" : "text-faint"}
           aria-hidden
         />
       ))}
