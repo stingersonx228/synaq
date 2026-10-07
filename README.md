@@ -1,6 +1,6 @@
 # Synaq MVP
 
-Прод: https://synaq-pi.vercel.app (Vercel, проект `synaq` в команде stingersonx-s-projects).
+Прод: https://synaq-pi.vercel.app (Vercel, проект `synaq` в команде stingersonx-s-projects, автодеплой из `main`).
 
 Образовательная игра: ИИ-стажёр Алибек решает задачу по алгебре с заранее заложенной ошибкой. Ученик находит строку, объясняет причину и доказывает ошибку контрпримером. Сдачу стажёра решает детерминированная проверка (mathjs), а не LLM.
 
@@ -41,7 +41,9 @@ RLS включён на всех таблицах без политик: дос�
 
 ## Деплой на Vercel
 
-Проект уже привязан (`.vercel/` локально, в git не попадает). Повторный деплой:
+Проект `synaq` подключён к GitHub-репозиторию `stingersonx228/synaq`: каждый push в `main` автоматически выкатывается на https://synaq-pi.vercel.app, push в другие ветки создаёт preview-деплой.
+
+Ручной деплой из локальной папки (если нужно выкатить без коммита):
 
 ```bash
 npx vercel deploy --prod --scope stingersonx-s-projects
