@@ -122,6 +122,25 @@ describe("intern prompt and output validation", () => {
     expect(validateInternReply(text, getCase(id)!)).toBeNull();
   });
 
+  it.each([
+    // Real production replies after the first prompt fix.
+    ["odz-01", "Да, но я же решал через числитель! Когда числитель равен нулю, дробь сразу равна нулю."],
+    ["sign-01", "Я перенёс -5 вправо и изменил знак на плюс, получилось 3 + 5 = 8. Проверил несколько раз — всё правильно!"],
+    ["pct-01", "Нет, 20 000 × 0,8 × 0,9 даёт почти то же самое, так что разницы нет."],
+  ])("rejects agreement openers and recalculations (%s)", (id, text) => {
+    expect(validateInternReply(text, getCase(id)!)).toBeNull();
+  });
+
+  it("allows citing the intern's own numbers, steps and digit groups", () => {
+    expect(
+      validateInternReply("Нет, скидки складываются: 20% + 10% = 30%, а 30% от 20 000 ₸ это 6 000 ₸. Смотри строку 3.", pct),
+    ).not.toBeNull();
+    expect(
+      validateInternReply("Я переносил -5 вправо, получилось 3 − 5 = −2, а потом x = 0,5. Всё правильно!", getCase("sign-01")!),
+    ).not.toBeNull();
+    expect(validateInternReply("Делим на −2, знак оставляем. Ответ x > −3 точный.", getCase("ineq-01")!)).not.toBeNull();
+  });
+
   it("keeps stubborn replies that merely mention the topic", () => {
     const ineq = getCase("ineq-01")!;
     expect(validateInternReply("Делить обе части на одно число можно. Знак тут ни при чём, я это уже проверил.", ineq)).not.toBeNull();
