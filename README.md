@@ -37,7 +37,7 @@ npm run dev
 
 В Vercel нужны две переменные:
 - `NEXT_PUBLIC_SUPABASE_URL` = `https://ydjlnbfrmccnrdkceftl.supabase.co` (уже задана);
-- `SUPABASE_SERVICE_ROLE_KEY`: секретный ключ из Supabase → Project Settings → API Keys (`service_role` или `sb_secret_…`), тип Sensitive, только сервер.
+- `SUPABASE_SERVICE_ROLE_KEY` (задана): секретный ключ из Supabase → Project Settings → API Keys (`service_role` или `sb_secret_…`), тип Sensitive, только сервер.
 
 Новая база с нуля: создать проект, выполнить `supabase/migrations/0001_init.sql` в SQL Editor и задать те же две переменные.
 
