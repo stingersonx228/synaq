@@ -443,7 +443,7 @@ export function RoundDebrief({
 }
 
 function ScoreBreakdown({ round }: { round: Round }) {
-  const items: [string, number][] = [["Нашёл и доказал", SCORE.found]];
+  const items: [string, number][] = [["Ошибка найдена и доказана", SCORE.found]];
   if (round.causeOk) items.push(["Причина названа верно", SCORE.causeOk]);
   if (round.refuteTries === 1) items.push(["С первой попытки", SCORE.firstTry]);
   if (round.hintsUsed > 0) items.push([`Подсказки: ${round.hintsUsed}`, -hintPenalty(round.hintsUsed)]);

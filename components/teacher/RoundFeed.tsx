@@ -5,18 +5,19 @@ import type { Outcome } from "@/lib/types";
 
 const timeFmt = new Intl.DateTimeFormat("ru-RU", { hour: "2-digit", minute: "2-digit", timeZone: "Asia/Almaty" });
 
-function verb(outcome: Outcome, clean: boolean): string {
+// Outcome phrases, not verbs about the student: a pseudonym does not tell us their gender.
+function outcomeText(outcome: Outcome, clean: boolean): string {
   switch (outcome) {
     case "solved":
-      return clean ? "подтвердил верное решение" : "разоблачил Алибека";
+      return clean ? "верно: ошибок нет" : "Алибек сдался";
     case "failed_proof":
-      return "не смог доказать ошибку";
+      return "доказательство не удалось";
     case "missed_clean":
-      return "пропустил ошибку";
+      return "ошибка проскочила";
     case "wrong_line":
-      return "потерял все жизни";
+      return "жизни закончились";
     case "false_accusation":
-      return "обвинил верное решение";
+      return "ложная тревога";
   }
 }
 
@@ -39,10 +40,13 @@ export default function RoundFeed({ rounds }: { rounds: RecentRound[] }) {
               ) : (
                 <XIcon size={18} weight="bold" className="text-bad" aria-label="Поражение" />
               )}
-              <p className="min-w-0 leading-snug">
-                <span className="font-semibold">{r.nickname}</span> {verb(r.outcome, r.typeId === "clean")}
-                <span className="text-muted">: {typeName(r.typeId)}</span>
-              </p>
+              <div className="min-w-0 leading-snug">
+                <p>
+                  <span className="font-semibold">{r.nickname}</span>{" "}
+                  <span className={won ? "text-good" : "text-bad"}>{outcomeText(r.outcome, r.typeId === "clean")}</span>
+                </p>
+                <p className="text-sm text-muted">{typeName(r.typeId)}</p>
+              </div>
               <span className="flex items-baseline gap-3 text-sm">
                 {won ? <span className="font-mono text-base text-good">+{r.score}</span> : null}
                 <span className="font-mono text-muted">{timeFmt.format(new Date(r.at))}</span>

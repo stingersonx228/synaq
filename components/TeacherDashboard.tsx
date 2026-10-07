@@ -184,7 +184,7 @@ export default function TeacherDashboard({
                       )}
                     </td>
                     <td className="px-4 py-3 text-muted">
-                      {s.lastActive ? dateFmt.format(new Date(s.lastActive)) : "ещё не играл"}
+                      {s.lastActive ? dateFmt.format(new Date(s.lastActive)) : "раундов пока нет"}
                     </td>
                   </tr>
                 ))}
