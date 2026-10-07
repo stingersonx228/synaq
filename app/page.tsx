@@ -4,6 +4,7 @@ import JoinForm from "@/components/JoinForm";
 import SolutionSheet from "@/components/game/SolutionSheet";
 import { buttonClass, InternAvatar, Wordmark } from "@/components/game/ui";
 import { getCase } from "@/lib/catalog";
+import { codeFromParam } from "@/lib/schemas";
 
 const PREVIEW = getCase("pct-01")!;
 
@@ -13,7 +14,8 @@ const FLOW = [
   ["Докажи", "Подбери число-контрпример. Проверяет математика, а не ИИ, поэтому сдача честная."],
 ] as const;
 
-export default function Home() {
+export default async function Home({ searchParams }: PageProps<"/">) {
+  const initialCode = codeFromParam((await searchParams).code);
   return (
     <div className="flex min-h-[100dvh] flex-col">
       <header className="mx-auto flex h-16 w-full max-w-7xl items-center justify-between px-4">
@@ -94,7 +96,7 @@ export default function Home() {
             </p>
           </div>
           <div className="rounded-xl border border-line bg-surface p-5 sm:p-6">
-            <JoinForm />
+            <JoinForm initialCode={initialCode} />
           </div>
         </section>
 

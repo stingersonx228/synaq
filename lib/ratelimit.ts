@@ -66,7 +66,8 @@ const SPAM_LIMITS = {
   // A whole class often shares one school IP.
   join: { limit: 120, windowMs: 10 * MINUTE_MS },
   createClass: { limit: 10, windowMs: HOUR_MS },
-  stats: { limit: 120, windowMs: 10 * MINUTE_MS },
+  // The live dashboard polls every 5 s; leave room for a projector tab plus the teacher's own.
+  stats: { limit: 600, windowMs: 10 * MINUTE_MS },
   // 30 students x 6 rounds plus retries, from one school IP.
   attempt: { limit: 600, windowMs: 10 * MINUTE_MS },
 } as const;

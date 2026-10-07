@@ -34,6 +34,13 @@ export const InternBody = z.object({
 
 export const CLASS_CODE_RE = /^[A-HJ-NP-Z2-9]{6}$/;
 
+/** Code from a ?code= join link (QR on the teacher panel); anything else becomes "". */
+export function codeFromParam(raw: unknown): string {
+  if (typeof raw !== "string") return "";
+  const code = raw.trim().toUpperCase();
+  return CLASS_CODE_RE.test(code) ? code : "";
+}
+
 export const JoinBody = z.object({
   code: z
     .string()

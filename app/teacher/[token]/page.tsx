@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { headers } from "next/headers";
 import { notFound } from "next/navigation";
-import TeacherDashboard from "@/components/TeacherDashboard";
+import LiveDashboard from "@/components/teacher/LiveDashboard";
+import { buildInvite, requestOrigin } from "@/lib/invite";
 import { getSupabase } from "@/lib/supabase";
 import { loadClassDashboard, type ClassDashboard } from "@/lib/teacher";
 
@@ -35,7 +37,17 @@ export default async function TeacherPanelPage({ params }: PageProps<"/teacher/[
     return <Notice title="Не удалось загрузить данные">Попробуйте обновить страницу через минуту.</Notice>;
   }
   if (!dashboard) notFound();
-  return <TeacherDashboard name={dashboard.name} code={dashboard.code} stats={dashboard.stats} />;
+  const { joinUrl, qrSvg } = await buildInvite(dashboard.code, requestOrigin(await headers()));
+  return (
+    <LiveDashboard
+      token={token}
+      name={dashboard.name}
+      code={dashboard.code}
+      initial={dashboard.stats}
+      joinUrl={joinUrl}
+      qrSvg={qrSvg}
+    />
+  );
 }
 
 function Notice({ title, children }: { title: string; children: ReactNode }) {

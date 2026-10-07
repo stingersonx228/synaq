@@ -1,5 +1,7 @@
 import type { ReactNode } from "react";
 import { Wordmark } from "@/components/game/ui";
+import LessonPlan from "@/components/teacher/LessonPlan";
+import PrintButton from "@/components/teacher/PrintButton";
 import { plural } from "@/lib/plural";
 import type { ClassStats } from "@/lib/stats";
 
@@ -18,11 +20,17 @@ export default function TeacherDashboard({
   code,
   stats,
   demo = false,
+  invite,
+  status,
 }: {
   name: string;
   code: string;
   stats: ClassStats;
   demo?: boolean;
+  /** Join QR and link (real classes only). */
+  invite?: ReactNode;
+  /** Live-update indicator. */
+  status?: ReactNode;
 }) {
   return (
     <main className="mx-auto w-full max-w-6xl px-4 py-8">
@@ -38,13 +46,22 @@ export default function TeacherDashboard({
           <Wordmark />
           <h1 className="mt-2 font-display text-3xl font-bold sm:text-4xl">Класс {name}</h1>
         </div>
-        <div className="rounded-xl border border-line bg-surface px-5 py-3 text-right">
-          <p className="text-sm text-muted">Код для учеников</p>
-          <p className="font-mono text-3xl font-bold tracking-[0.25em] text-pen">{code}</p>
+        <div className="flex flex-wrap items-center gap-3">
+          {invite ? null : (
+            <div className="rounded-xl border border-line bg-surface px-5 py-3 text-right">
+              <p className="text-sm text-muted">Код для учеников</p>
+              <p className="font-mono text-3xl font-bold tracking-[0.25em] text-pen">{code}</p>
+            </div>
+          )}
+          <PrintButton />
         </div>
       </header>
 
-      <p className="mt-4 text-lg text-muted">
+      {invite}
+
+      {status ? <div className="mt-6">{status}</div> : null}
+
+      <p className={`${status ? "mt-2" : "mt-4"} text-lg text-muted`}>
         <span className="font-mono font-semibold text-text">{stats.studentCount}</span>{" "}
         {plural(stats.studentCount, ["ученик", "ученика", "учеников"])}{" "}
         {plural(stats.studentCount, ["сыграл", "сыграли", "сыграли"])}{" "}
@@ -84,6 +101,8 @@ export default function TeacherDashboard({
               </ol>
             )}
           </section>
+
+          <LessonPlan spots={stats.blindSpots} />
 
           <section className="mt-10">
             <h2 className="font-display text-xl font-bold">Какие типы ошибок класс не заметил</h2>

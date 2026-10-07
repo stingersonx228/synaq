@@ -151,6 +151,26 @@ body {
   animation: typing-dot 1.2s infinite;
 }
 
+/* Printed teacher report: same layout, paper colors. */
+@media print {
+  :root {
+    color-scheme: light;
+    --color-ink: #ffffff;
+    --color-surface: #ffffff;
+    --color-surface-2: #f1f2f4;
+    --color-line: #c9ccd3;
+    --color-text: #111318;
+    --color-muted: #454a55;
+    --color-pen: #c2410c;
+    --color-bad: #b91c1c;
+    --color-good: #047857;
+  }
+
+  body {
+    background: #ffffff;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .flash-good,
   .flash-bad,

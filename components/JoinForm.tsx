@@ -13,9 +13,9 @@ const NICK_MAX = 24;
 const inputClass =
   "w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none transition placeholder:text-muted focus:border-pen";
 
-export default function JoinForm() {
+export default function JoinForm({ initialCode = "" }: { initialCode?: string }) {
   const router = useRouter();
-  const [code, setCode] = useState("");
+  const [code, setCode] = useState(initialCode);
   const [nickname, setNickname] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -73,6 +73,7 @@ export default function JoinForm() {
           onChange={(e) => setNickname(e.target.value.slice(0, NICK_MAX))}
           placeholder="Барыс_42"
           autoComplete="off"
+          autoFocus={initialCode !== ""}
           aria-describedby="nickname-help"
           className={inputClass}
         />
