@@ -83,6 +83,21 @@ export function formatNumber(n: number): string {
   return rounded.toLocaleString("ru-RU", { maximumFractionDigits: 6 }).replace(/-/g, "−");
 }
 
+/**
+ * Student-facing summary of a successful proof with the numbers it produced, so even a lucky
+ * guess ends with a concrete lesson ("Alibek's way gives 14 000, the right way 14 400").
+ */
+export function describeProof(spec: RefuteSpec, values: Values, result: RefuteResult): string {
+  const at = spec.vars.map((v) => `${v} = ${formatNumber(values[v])}`).join(", ");
+  if (spec.mode === "diverge" && result.wrong !== undefined && result.right !== undefined) {
+    return `При ${at} способ Алибека даёт ${formatNumber(result.wrong)}, а верный способ ${formatNumber(result.right)}.`;
+  }
+  if (spec.mode === "missing") {
+    return `${at} подходит к условию задачи, но в ответе Алибека этого корня нет.`;
+  }
+  return `${at} есть в ответе Алибека, но условие задачи при этом значении не выполняется.`;
+}
+
 /** Student-facing explanation of why a proof attempt did not work. */
 export function explainRefutation(result: RefuteResult): string {
   if (result.ok) return "Доказательство верное: стажёр ошибся.";

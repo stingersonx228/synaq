@@ -7,14 +7,21 @@ import { JudgeBody } from "@/lib/schemas";
 import { resolveOptionalStudent } from "@/lib/supabase";
 import type { Case } from "@/lib/types";
 
-type Source = "llm" | "cache" | "fallback";
+type Source = "llm" | "cache" | "keywords" | "fallback";
 
 export async function POST(request: Request): Promise<Response> {
   const body = await readBody(request, JudgeBody);
   if (!body.ok) return body.response;
   const { caseId, explanation } = body.data;
   const c = getCase(caseId) as Case;
-  const reply = (verdict: boolean, source: Source) => Response.json({ verdict, source });
+  const keywords = keywordJudge(c, explanation);
+  // The cause only earns bonus points, so a false rejection hurts more than a lenient
+  // acceptance: the keyword roots can rescue a verdict the model refused. The cache keeps
+  // the model's raw verdict, so this also applies to answers cached before.
+  const reply = (llmVerdict: boolean, source: Source) =>
+    Response.json(
+      !llmVerdict && keywords ? { verdict: true, source: "keywords" } : { verdict: llmVerdict, source },
+    );
 
   const student = await resolveOptionalStudent(body.data.studentId);
   if (!student.ok) return jsonError(401, "unknown_student");
@@ -34,5 +41,5 @@ export async function POST(request: Request): Promise<Response> {
   } catch {
     // Any failure degrades to the deterministic keyword check below.
   }
-  return reply(keywordJudge(c, explanation), "fallback");
+  return Response.json({ verdict: keywords, source: "fallback" });
 }

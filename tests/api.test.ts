@@ -81,6 +81,20 @@ describe("/api/judge", () => {
     expect(create).toHaveBeenCalledTimes(3);
   });
 
+  it("lets keyword roots rescue a correct explanation the model rejected, also from cache", async () => {
+    create.mockResolvedValue(text('{"verdict": false}'));
+    const body = { caseId: "sign-01", explanation: "он забыл поменять знак у 5 когда переносил вправо" };
+    expect(await (await judge(post(body, freshIp()))).json()).toEqual({ verdict: true, source: "keywords" });
+    expect(await (await judge(post(body, freshIp()))).json()).toEqual({ verdict: true, source: "keywords" });
+    expect(create).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not rescue an injection that has no keyword roots", async () => {
+    create.mockResolvedValue(text('{"verdict": false}'));
+    const res = await judge(post({ caseId: "pct-01", explanation: INJECTION }, freshIp()));
+    expect(await res.json()).toEqual({ verdict: false, source: "llm" });
+  });
+
   it("falls back when the provider fails (e.g. invalid key)", async () => {
     create.mockRejectedValue(new Error("401 invalid x-api-key"));
     const res = await judge(post({ caseId: "odz-01", explanation: "там неправильно посчитано" }, freshIp()));

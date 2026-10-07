@@ -13,6 +13,8 @@ export interface AttemptRow {
   score: number;
   hints_used: number;
   lives_lost: number;
+  /** Whether the student named the cause; null when the round never got to an explanation. */
+  cause_ok: boolean | null;
   created_at: string;
 }
 
@@ -20,12 +22,14 @@ export interface TypeStat {
   typeId: string;
   name: string;
   rounds: number;
-  /** Rounds where the bug was not found, a life was lost, or all three hints were opened. */
+  /** Rounds where the bug was not found or explained, a life was lost, or all three hints were opened. */
   problemRounds: number;
   problemRate: number;
   missed: number;
   lifeLost: number;
   fullHints: number;
+  /** Proved the bug but could not name its cause: the Feynman part of the game. */
+  noCause: number;
 }
 
 export interface StudentStat {
@@ -61,8 +65,8 @@ export interface ClassStats {
 
 const TYPE_ORDER = [...new Set(CASES.map((c) => c.type_id))];
 
-export function isProblemRound(a: Pick<AttemptRow, "outcome" | "lives_lost" | "hints_used">): boolean {
-  return a.outcome !== "solved" || a.lives_lost > 0 || a.hints_used >= 3;
+export function isProblemRound(a: Pick<AttemptRow, "outcome" | "lives_lost" | "hints_used" | "cause_ok">): boolean {
+  return a.outcome !== "solved" || a.lives_lost > 0 || a.hints_used >= 3 || a.cause_ok === false;
 }
 
 export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): ClassStats {
@@ -79,6 +83,7 @@ export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): 
         missed: 0,
         lifeLost: 0,
         fullHints: 0,
+        noCause: 0,
       };
       byType.set(a.type_id, t);
     }
@@ -87,6 +92,7 @@ export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): 
     if (a.outcome !== "solved") t.missed += 1;
     if (a.lives_lost > 0) t.lifeLost += 1;
     if (a.hints_used >= 3) t.fullHints += 1;
+    if (a.outcome === "solved" && a.cause_ok === false) t.noCause += 1;
   }
   const types = [...byType.values()]
     .map((t) => ({ ...t, problemRate: t.rounds > 0 ? t.problemRounds / t.rounds : 0 }))

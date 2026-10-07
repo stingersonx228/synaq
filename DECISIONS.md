@@ -33,3 +33,8 @@
 - Confetti on Alibek's concession is CSS-only, deterministic and hidden under prefers-reduced-motion.
 - The landing page answers the jury's main question ("why not just ask ChatGPT to play dumb") with facts computed from the catalog, not marketing numbers.
 - Per-student weak types (top 3 by problem rounds) show in the teacher's student table; blind spots on the session summary expand into the cause and fix of the case the student actually played.
+- After an independent critic review: the judge's final verdict is "LLM or keyword roots" (the cause only earns bonus points, so a false rejection is worse than leniency; the cache stores the raw LLM verdict), and the judge prompt asks for the gist in the student's own words, with examples.
+- A winning proof is summarized with the computed numbers in the debrief ("способ Алибека даёт 0,7, а верный способ 0,72"); concession lines no longer quote specific x values that may differ from the student's input.
+- Round steps are shown on clean cases too and the backup intern swaps to any case, so the UI never reveals that a case is clean.
+- A proved round without a named cause counts as a problem round on the teacher panel (new "Без причины" column), since explaining is the point of the game.
+- Copy: no claim that the game "cannot be fooled"; the data note says the anonymous explanation goes to the AI model for grading and is not stored. The landing preview uses pct-03, not the stage demo case.

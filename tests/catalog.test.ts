@@ -109,6 +109,15 @@ describe("session picking", () => {
       expect(ids.filter((id) => getCase(id)!.bug === null)).toHaveLength(1);
     }
   });
+  it("replacement may switch between clean and buggy cases, so a swap never reveals the kind", () => {
+    const kinds = new Set<boolean>();
+    for (let i = 0; i < 60; i++) {
+      const id = pickReplacement("lin-ok", ["lin-ok"]);
+      kinds.add(getCase(id!)!.bug === null);
+    }
+    expect(kinds).toEqual(new Set([true, false]));
+  });
+
   it("replacement avoids excluded cases", () => {
     const exclude = CASES.map((c) => c.id).filter((id) => id !== "sq-01" && id !== "pct-01");
     expect(pickReplacement("pct-01", exclude)).toBe("sq-01");

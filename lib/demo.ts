@@ -8,7 +8,6 @@ import type { Outcome } from "./types";
 const SEED = 20261007;
 const STUDENTS = 30;
 const NOW = Date.parse("2026-10-06T12:00:00Z");
-const HOUR = 3600 * 1000;
 
 /** Share of problem rounds per error type, tuned to look like a typical 9th grade. */
 const DIFFICULTY: Record<string, number> = {
@@ -62,7 +61,9 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
     // Skill shifts every difficulty by up to ±0.2 so students differ visibly.
     const skill = (rng() - 0.5) * 0.4;
     const rounds = 4 + Math.floor(rng() * 15);
-    const lastSeen = NOW - Math.floor(rng() * 9 * 24) * HOUR;
+    // Uneven timestamps: real classes do not play on the hour or every 7 minutes exactly.
+    const lastSeen = NOW - Math.floor(rng() * 9 * 24 * 60) * 60 * 1000;
+    let at = lastSeen;
     for (let r = 0; r < rounds; r++) {
       const c = pick(CASES);
       const pProblem = Math.min(0.95, Math.max(0.03, (DIFFICULTY[c.type_id] ?? 0.3) - skill));
@@ -82,6 +83,7 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
       const refuteTries = c.bug && outcome === "solved" ? 1 + Math.floor(rng() * 2) : 0;
       const causeOk = c.bug && outcome === "solved" ? rng() < 0.7 - skill : null;
       const score = roundScore({ outcome, clean: c.bug === null, causeOk, refuteTries, hintsUsed: hints });
+      at -= Math.floor((2 + rng() * 9) * 60 * 1000 + rng() * 59 * 1000);
       attempts.push({
         student_id: id,
         type_id: c.type_id,
@@ -89,7 +91,8 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
         score,
         hints_used: hints,
         lives_lost: livesLost,
-        created_at: new Date(lastSeen - r * 7 * 60 * 1000).toISOString(),
+        cause_ok: causeOk,
+        created_at: new Date(at).toISOString(),
       });
     }
   }

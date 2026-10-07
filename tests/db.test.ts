@@ -196,6 +196,7 @@ describe("aggregateStats", () => {
     score: 100,
     hints_used: 0,
     lives_lost: 0,
+    cause_ok: true,
     created_at: "2026-10-01T10:00:00Z",
     ...extra,
   });
@@ -229,6 +230,16 @@ describe("aggregateStats", () => {
       { nickname: "Тулпар", rounds: 2, avgScore: 70, lastActive: "2026-10-01T10:00:00Z", weakTypes: ["odz"] },
       { nickname: "Новичок", rounds: 0, avgScore: 0, lastActive: null, weakTypes: [] },
     ]);
+  });
+
+  it("counts a proved round without a named cause as a problem round", () => {
+    const s = aggregateStats(
+      [{ id: "a", nickname: "Барыс" }],
+      [row("a", "odz"), row("a", "odz", { cause_ok: false, score: 60 }), row("a", "lin-ok-type", { cause_ok: null })],
+    );
+    const odz = s.types.find((t) => t.typeId === "odz")!;
+    expect(odz).toMatchObject({ rounds: 2, problemRounds: 1, noCause: 1, missed: 0 });
+    expect(s.types.find((t) => t.typeId === "lin-ok-type")!.problemRounds).toBe(0);
   });
 
   it("lists the latest rounds newest first with nicknames", () => {

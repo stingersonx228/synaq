@@ -111,16 +111,17 @@ export default function TeacherDashboard({
           <section className="mt-10">
             <h2 className="font-display text-xl font-bold">Какие типы ошибок класс не заметил</h2>
             <p className="mt-1 text-sm text-muted">
-              Проблемный раунд: ошибку не нашли или не доказали, потеряли жизнь или открыли все 3 подсказки.
+              Проблемный раунд: ошибку не нашли или не доказали, доказали, но не смогли объяснить причину, потеряли жизнь или открыли все 3 подсказки.
             </p>
             <div className="mt-3 overflow-x-auto rounded-xl border border-line">
-              <table className="w-full min-w-[640px] text-left">
+              <table className="w-full min-w-[720px] text-left">
                 <thead className="bg-surface text-sm text-muted">
                   <tr>
                     <th className="px-4 py-3 font-semibold">Тип ошибки</th>
                     <th className="px-4 py-3 font-semibold">Проблемных</th>
                     <th className="px-4 py-3 text-right font-semibold">Раундов</th>
                     <th className="px-4 py-3 text-right font-semibold">Не нашли</th>
+                    <th className="px-4 py-3 text-right font-semibold">Без причины</th>
                     <th className="px-4 py-3 text-right font-semibold">−жизнь</th>
                     <th className="px-4 py-3 text-right font-semibold">3 подсказки</th>
                   </tr>
@@ -139,6 +140,7 @@ export default function TeacherDashboard({
                       </td>
                       <td className="px-4 py-3 text-right tabular-nums">{t.rounds}</td>
                       <td className="px-4 py-3 text-right tabular-nums">{t.missed}</td>
+                      <td className="px-4 py-3 text-right tabular-nums">{t.noCause ?? 0}</td>
                       <td className="px-4 py-3 text-right tabular-nums">{t.lifeLost}</td>
                       <td className="px-4 py-3 text-right tabular-nums">{t.fullHints}</td>
                     </tr>

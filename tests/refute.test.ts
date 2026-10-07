@@ -141,3 +141,12 @@ describe("explainRefutation", () => {
     expect(text).toContain("0");
   });
 });
+
+describe("keepNumbersTogether", () => {
+  it("joins digit groups and the tenge sign with non-breaking spaces only", async () => {
+    const { keepNumbersTogether } = await import("../lib/format");
+    expect(keepNumbersTogether("20 000 × 0,3 = 6 000 ₸")).toBe("20 000 × 0,3 = 6 000 ₸");
+    expect(keepNumbersTogether("x = 2 или 3 4")).toBe("x = 2 или 3 4");
+    expect(keepNumbersTogether("1 250 000")).toBe("1 250 000");
+  });
+});

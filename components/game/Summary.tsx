@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { ArrowCounterClockwiseIcon, CaretDownIcon, CheckIcon, TargetIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
 import { getCase, SESSION_LIVES, typeName } from "@/lib/catalog";
+import { keepNumbersTogether } from "@/lib/format";
 import { plural } from "@/lib/plural";
 import { blindSpots, stars } from "@/lib/scoring";
 import type { StudentIdentity } from "@/lib/session";
@@ -116,18 +117,18 @@ export default function Summary({
                             <>
                               <p>
                                 <span className="text-muted">В чём ошибка: </span>
-                                {c.bug.cause}
+                                {keepNumbersTogether(c.bug.cause)}
                               </p>
                               <p>
                                 <span className="text-muted">Как правильно: </span>
-                                {c.bug.fix}
+                                {keepNumbersTogether(c.bug.fix)}
                               </p>
                             </>
                           ) : (
                             <p>
                               <span className="text-muted">Что случилось: </span>
-                              решение было верным, а ошибку ты увидел в правильном шаге. Прежде чем обвинять строку,
-                              подставь ответ в исходное условие.
+                              решение было верным, а ошибка была отмечена в правильном шаге. Прежде чем обвинять
+                              строку, пересчитай её сам.
                             </p>
                           )}
                         </div>

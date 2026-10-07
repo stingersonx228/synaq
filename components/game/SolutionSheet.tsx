@@ -1,4 +1,5 @@
 import { CheckIcon, PenNibIcon } from "@phosphor-icons/react/dist/ssr";
+import { keepNumbersTogether } from "@/lib/format";
 
 export type LineState = "idle" | "marked" | "cleared" | "bug";
 
@@ -47,9 +48,9 @@ export default function SolutionSheet({
               <span
                 className={`${compact ? "text-base sm:text-lg" : "text-lg sm:text-xl"} leading-relaxed ${
                   state === "marked" || state === "bug" ? "pen-mark" : ""
-                } ${state === "cleared" ? "text-muted line-through decoration-muted/60" : ""}`}
+                } ${state === "cleared" ? "text-muted" : ""}`}
               >
-                {text}
+                {keepNumbersTogether(text)}
               </span>
               <LineTag state={state} clickable={clickable} />
             </>
@@ -79,7 +80,7 @@ export default function SolutionSheet({
         }`}
       >
         <span className="text-muted">Ответ Алибека</span>
-        <span className="text-xl font-semibold">{answer}</span>
+        <span className="text-xl font-semibold">{keepNumbersTogether(answer)}</span>
       </div>
     </div>
   );

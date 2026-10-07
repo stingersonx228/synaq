@@ -3,8 +3,9 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowsClockwiseIcon, PenNibIcon } from "@phosphor-icons/react/dist/ssr";
 import { getCase, INTERN_LINES, pickPracticeCases, pickReplacement } from "@/lib/catalog";
+import { keepNumbersTogether } from "@/lib/format";
 import { fetchInternReply, fetchJudgeVerdict, newId, saveAttempt, type NetOptions } from "@/lib/client";
-import { checkRefutation, explainRefutation, parseValues } from "@/lib/refute";
+import { checkRefutation, describeProof, explainRefutation, parseValues } from "@/lib/refute";
 import { blindSpots, MAX_HINTS, MAX_REFUTE_TRIES, roundScore, stars } from "@/lib/scoring";
 import { getStudent, recordSession, setStudent, type StudentIdentity } from "@/lib/session";
 import type { Case, Outcome } from "@/lib/types";
@@ -174,7 +175,8 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     if (round.phase !== "prove" || busy || !c.bug) return;
     const token = round.token;
     const bug = c.bug;
-    const result = checkRefutation(bug.refute, parseValues(bug.refute.vars, raw));
+    const values = parseValues(bug.refute.vars, raw);
+    const result = checkRefutation(bug.refute, values);
     if (!result.ok && result.reason === "invalid_input") {
       updateRound(token, (r) => ({ ...r, proofFeedback: explainRefutation(result) }));
       return;
@@ -184,7 +186,8 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     updateRound(token, (r) => addMsg({ ...r, refuteTries: tries }, "student", `Проверь при ${shown}.`));
 
     if (result.ok) {
-      updateRound(token, (r) => ({ ...r, proofFeedback: null, typing: true }));
+      const proof = describeProof(bug.refute, values, result);
+      updateRound(token, (r) => ({ ...r, proofFeedback: null, proof, typing: true }));
       const pending = judgeRef.current?.token === token ? judgeRef.current.verdict : Promise.resolve(false);
       const [causeOk] = await Promise.all([pending, wait(TYPING_MS)]);
       updateRound(token, (r) => addMsg({ ...r, typing: false, causeOk }, "intern", bug.concede, "concede"));
@@ -307,7 +310,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
                 </button>
               ) : null}
             </div>
-            <h1 className="mt-2 max-w-[42ch] text-2xl font-semibold leading-snug sm:text-3xl">{c.task}</h1>
+            <h1 className="mt-2 max-w-[42ch] text-2xl font-semibold leading-snug sm:text-3xl">{keepNumbersTogether(c.task)}</h1>
           </section>
 
           {round.phase === "pick" && !busy ? (
@@ -337,7 +340,8 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
           <LatestReply chat={round.chat} typing={round.typing} />
 
           <section className="flex flex-col gap-5 rounded-xl border border-line bg-surface p-4 sm:p-5">
-            {!done && c.bug ? <PhaseSteps phase={round.phase} /> : null}
+            {/* Shown on clean cases too, so the layout never hints that there is no bug. */}
+            {!done ? <PhaseSteps phase={round.phase} /> : null}
             {round.phase === "pick" ? <PickActions onClean={declareClean} disabled={busy} /> : null}
             {round.phase === "explain" ? (
               <ExplainForm key={round.token} line={round.foundLine} disabled={busy} onSubmit={submitExplanation} />

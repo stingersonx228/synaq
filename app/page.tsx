@@ -14,7 +14,8 @@ import { CASES, getCase } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import { codeFromParam } from "@/lib/schemas";
 
-const PREVIEW = getCase("pct-01")!;
+// Not the stage demo case (pct-01): the landing must not give away the answer the jury sees later.
+const PREVIEW = getCase("pct-03")!;
 
 const BUGGY = CASES.filter((c) => c.bug !== null);
 const ERROR_TYPES = new Set(BUGGY.map((c) => c.type_id)).size;
@@ -28,7 +29,7 @@ const WHY = [
   {
     Icon: FunctionIcon,
     title: "Сдаётся только по математике",
-    text: "Контрпример ученика проверяет код, а не нейросеть. Уговорить Алибека нельзя, обмануть тоже.",
+    text: "Контрпример ученика проверяет код, а не нейросеть. Уговорить Алибека нельзя: нужно число, которое ломает его решение.",
   },
   {
     Icon: ChatCircleDotsIcon,
@@ -38,7 +39,7 @@ const WHY = [
   {
     Icon: ShieldCheckIcon,
     title: "Без персональных данных",
-    text: "Вход по коду класса и псевдониму. Объяснения учеников не сохраняются.",
+    text: "Вход по коду класса и псевдониму. Объяснение без имени уходит в модель ИИ только для оценки, мы его не храним.",
   },
 ] as const;
 
@@ -179,7 +180,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
       <footer className="border-t border-line">
         <p className="mx-auto w-full max-w-7xl px-4 py-6 text-sm text-muted">
-          Без рекламы и трекеров. Объяснения учеников не сохраняются.
+          Без рекламы и трекеров. Имён не собираем, объяснения учеников не храним.
         </p>
       </footer>
     </div>

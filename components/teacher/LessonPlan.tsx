@@ -1,4 +1,5 @@
 import { CASES } from "@/lib/catalog";
+import { keepNumbersTogether } from "@/lib/format";
 import type { TypeStat } from "@/lib/stats";
 
 const pct = (x: number) => `${Math.round(x * 100)}%`;
@@ -36,9 +37,9 @@ export default function LessonPlan({ spots }: { spots: TypeStat[] }) {
                 {c.bug ? (
                   <>
                     <dt className="text-muted">Типичная ошибка</dt>
-                    <dd className="leading-relaxed">{c.bug.cause}</dd>
+                    <dd className="leading-relaxed">{keepNumbersTogether(c.bug.cause)}</dd>
                     <dt className="text-muted">Как объяснить</dt>
-                    <dd className="leading-relaxed">{c.bug.fix}</dd>
+                    <dd className="leading-relaxed">{keepNumbersTogether(c.bug.fix)}</dd>
                   </>
                 ) : (
                   <>
@@ -55,10 +56,10 @@ export default function LessonPlan({ spots }: { spots: TypeStat[] }) {
                 )}
                 <dt className="text-muted">Задача для доски</dt>
                 <dd className="leading-relaxed">
-                  {c.task}
+                  {keepNumbersTogether(c.task)}
                   {wrongStep ? (
                     <span className="mt-1 block text-muted">
-                      Решение «стажёра» с ошибкой в шаге: <span className="text-text">«{wrongStep}»</span>
+                      Решение «стажёра» с ошибкой в шаге: <span className="text-text">«{keepNumbersTogether(wrongStep)}»</span>
                     </span>
                   ) : (
                     <span className="mt-1 block text-muted">

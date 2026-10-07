@@ -20,6 +20,8 @@ export interface Round {
   causeOk: boolean | null;
   refuteTries: number;
   proofFeedback: string | null;
+  /** What the winning proof showed, with the computed numbers. */
+  proof: string | null;
   chat: ChatMsg[];
   typing: boolean;
   outcome: Outcome | null;
@@ -63,6 +65,7 @@ export function newRound(caseId: string, token: number): Round {
     causeOk: null,
     refuteTries: 0,
     proofFeedback: null,
+    proof: null,
     chat: [{ key: `${token}-0`, from: "intern", text: INTERN_LINES.greeting }],
     typing: false,
     outcome: null,

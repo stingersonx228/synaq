@@ -12,6 +12,7 @@ import {
   WifiSlashIcon,
 } from "@phosphor-icons/react/dist/ssr";
 import { SESSION_LIVES } from "@/lib/catalog";
+import { keepNumbersTogether } from "@/lib/format";
 import { hintPenalty, MAX_HINTS, MAX_REFUTE_TRIES, SCORE, stars } from "@/lib/scoring";
 import type { StudentIdentity } from "@/lib/session";
 import type { Case, Outcome } from "@/lib/types";
@@ -89,33 +90,36 @@ function RoundTrack({ game }: { game: GameState }) {
 
 // ---------- Phase steps ----------
 
-const STEPS: { phase: Exclude<Phase, "done">; label: string; Icon: typeof MagnifyingGlassIcon }[] = [
-  { phase: "pick", label: "Найди строку", Icon: MagnifyingGlassIcon },
-  { phase: "explain", label: "Объясни", Icon: ChatTextIcon },
-  { phase: "prove", label: "Докажи", Icon: FunctionIcon },
+const STEPS: { phase: Exclude<Phase, "done">; label: string; short: string; Icon: typeof MagnifyingGlassIcon }[] = [
+  { phase: "pick", label: "Найди строку", short: "Найди", Icon: MagnifyingGlassIcon },
+  { phase: "explain", label: "Объясни", short: "Объясни", Icon: ChatTextIcon },
+  { phase: "prove", label: "Докажи", short: "Докажи", Icon: FunctionIcon },
 ];
 
 export function PhaseSteps({ phase }: { phase: Phase }) {
   const current = phase === "done" ? STEPS.length : STEPS.findIndex((s) => s.phase === phase);
   return (
     <ol className="grid grid-cols-3 gap-2" aria-label="Шаги раунда">
-      {STEPS.map(({ phase: p, label, Icon }, i) => {
+      {STEPS.map(({ phase: p, label, short, Icon }, i) => {
         const done = i < current;
         const active = i === current;
         return (
           <li
             key={p}
             aria-current={active ? "step" : undefined}
-            className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-sm font-medium transition-colors duration-300 sm:text-base ${
+            className={`flex min-w-0 items-center justify-center gap-1.5 rounded-xl border px-2 py-2 text-sm sm:justify-start font-medium transition-colors duration-300 sm:gap-2 sm:px-3 sm:text-base ${
               active ? "border-pen bg-pen/10 text-text" : done ? "border-line text-muted" : "border-line/50 text-muted"
             }`}
           >
             {done ? (
-              <CheckIcon size={18} className="shrink-0 text-good" aria-hidden />
+              <CheckIcon size={18} className="hidden shrink-0 text-good sm:block" aria-hidden />
             ) : (
-              <Icon size={18} className={`shrink-0 ${active ? "text-pen" : ""}`} aria-hidden />
+              <Icon size={18} className={`hidden shrink-0 sm:block ${active ? "text-pen" : ""}`} aria-hidden />
             )}
-            <span className="truncate">{label}</span>
+            <span className="truncate">
+              <span className="sm:hidden">{short}</span>
+              <span className="hidden sm:inline">{label}</span>
+            </span>
           </li>
         );
       })}
@@ -213,7 +217,7 @@ function ChatBubble({ msg }: { msg: ChatMsg }) {
     return (
       <li className="rise flex justify-end">
         <p className="max-w-[88%] rounded-xl rounded-br-sm bg-pen/12 px-4 py-2.5 leading-snug ring-1 ring-pen/30">
-          {msg.text}
+          {keepNumbersTogether(msg.text)}
         </p>
       </li>
     );
@@ -225,7 +229,7 @@ function ChatBubble({ msg }: { msg: ChatMsg }) {
           msg.tone === "concede" ? "bg-good/15 ring-1 ring-good/50" : "bg-surface-2"
         }`}
       >
-        {msg.text}
+        {keepNumbersTogether(msg.text)}
       </p>
     </li>
   );
@@ -256,7 +260,7 @@ export function LatestReply({ chat, typing }: { chat: ChatMsg[]; typing: boolean
           last?.tone === "concede" && !typing ? "bg-good/15 ring-1 ring-good/50" : "bg-surface-2"
         }`}
       >
-        {typing ? "Алибек печатает…" : last?.text}
+        {typing ? "Алибек печатает…" : keepNumbersTogether(last?.text ?? "")}
       </p>
     </div>
   );
@@ -421,19 +425,25 @@ export function RoundDebrief({
 
       {c.bug ? (
         <dl className="grid gap-4 sm:grid-cols-[10rem_1fr]">
+          {round.proof ? (
+            <>
+              <dt className="text-muted">Твоё доказательство</dt>
+              <dd className="text-lg leading-relaxed">{keepNumbersTogether(round.proof)}</dd>
+            </>
+          ) : null}
           <dt className="text-muted">Ошибка в строке {c.bug.accept_steps.join(", ")}</dt>
-          <dd className="text-lg leading-relaxed">{c.bug.cause}</dd>
+          <dd className="text-lg leading-relaxed">{keepNumbersTogether(c.bug.cause)}</dd>
           <dt className="text-muted">Как правильно</dt>
-          <dd className="text-lg leading-relaxed">{c.bug.fix}</dd>
+          <dd className="text-lg leading-relaxed">{keepNumbersTogether(c.bug.fix)}</dd>
           <dt className="text-muted">Верный ответ</dt>
-          <dd className="font-display text-xl font-bold text-good">{c.bug.correct_answer}</dd>
+          <dd className="font-display text-xl font-bold text-good">{keepNumbersTogether(c.bug.correct_answer)}</dd>
         </dl>
       ) : (
         <p className="text-lg leading-relaxed">
-          Решение было верным, ответ <span className="font-semibold text-good">{c.answer}</span>.{" "}
+          Решение было верным, ответ <span className="font-semibold text-good">{keepNumbersTogether(c.answer)}</span>.{" "}
           {won
             ? "Иногда стажёр не ошибается, и честная проверка тоже победа."
-            : "Прежде чем обвинять строку, подставь ответ в исходное уравнение."}
+            : "Прежде чем обвинять строку, проверь её сам: пересчитай шаг или подставь ответ в условие."}
         </p>
       )}
 

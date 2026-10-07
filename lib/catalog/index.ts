@@ -32,7 +32,7 @@ export const TYPE_NAMES: Record<string, string> = {
   root_formula: "Формула корней: знак b",
   log_sum: "Логарифмы: сумма вместо произведения",
   cancel_terms: "Дроби: сокращение слагаемых",
-  clean: "Решение без ошибки",
+  clean: "Ложная тревога: ошибки не было",
 };
 
 export function typeName(typeId: string): string {
@@ -44,7 +44,7 @@ export const INTERN_LINES = {
   greeting: "Привет! Я Алибек, стажёр. Задачу уже решил, всё точно верно. Можешь проверить, но ошибок не найдёшь.",
   wrongLine: (step: number) => `В строке ${step} у меня всё верно. Можешь пересчитать, всё сойдётся.`,
   missedBug: "Вот и я говорю: всё идеально!",
-  cleanWin: "Вот видишь, я же говорил. Спасибо, что проверил каждую строку честно.",
+  cleanWin: "Вот видишь, я же говорил. Спасибо за честную проверку каждой строки.",
   proofFailed: {
     invalid_input: "Ну и что это за число? Давай нормальное.",
     undefined: "Так нечестно, тут вообще ничего не посчитать.",
@@ -120,12 +120,12 @@ export function pickPracticeCases(spotTypes: string[], played: string[], rng: Rn
   return shuffle(picked, rng);
 }
 
-/** Picks a replacement case not in `exclude`, keeping the same clean/buggy kind when possible. */
+/**
+ * Picks any case not in `exclude`. Deliberately ignores clean/buggy kind: swapping a clean
+ * case only among clean cases would tell the player there is no bug.
+ */
 export function pickReplacement(current: string, exclude: string[], rng: Rng = Math.random): string | null {
-  const cur = getCase(current);
   const pool = CASES.filter((c) => c.id !== current && !exclude.includes(c.id));
   if (pool.length === 0) return null;
-  const sameKind = pool.filter((c) => (c.bug === null) === (cur?.bug === null));
-  const source = sameKind.length > 0 ? sameKind : pool;
-  return source[Math.floor(rng() * source.length)].id;
+  return pool[Math.floor(rng() * pool.length)].id;
 }
