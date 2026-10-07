@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, type FormEvent } from "react";
+import { useEffect, useRef, useState, type FormEvent } from "react";
 import { joinClass } from "@/lib/client";
 import { setStudent } from "@/lib/session";
 import { buttonClass } from "./game/ui";
@@ -16,6 +16,13 @@ const inputClass =
 export default function JoinForm({ initialCode = "" }: { initialCode?: string }) {
   const router = useRouter();
   const [code, setCode] = useState(initialCode);
+  const nicknameRef = useRef<HTMLInputElement>(null);
+
+  // Arriving from the QR join link: the code is filled in, so go straight to the nickname.
+  // (autoFocus does not fire on server-rendered inputs.)
+  useEffect(() => {
+    if (initialCode) nicknameRef.current?.focus({ preventScroll: true });
+  }, [initialCode]);
   const [nickname, setNickname] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
@@ -72,8 +79,8 @@ export default function JoinForm({ initialCode = "" }: { initialCode?: string })
           value={nickname}
           onChange={(e) => setNickname(e.target.value.slice(0, NICK_MAX))}
           placeholder="Барыс_42"
+          ref={nicknameRef}
           autoComplete="off"
-          autoFocus={initialCode !== ""}
           aria-describedby="nickname-help"
           className={inputClass}
         />

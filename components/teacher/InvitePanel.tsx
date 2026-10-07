@@ -7,21 +7,36 @@ import { buttonClass } from "@/components/game/ui";
 /** Class code, join QR and link. Can go full screen on a projector so a whole room can join. */
 export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; joinUrl: string; qrSvg: string }) {
   const ref = useRef<HTMLElement>(null);
-  const [fullscreen, setFullscreen] = useState(false);
+  const [nativeFullscreen, setNativeFullscreen] = useState(false);
+  // In-page overlay for browsers that refuse the Fullscreen API (iOS Safari, iframes).
+  const [overlay, setOverlay] = useState(false);
   const [copied, setCopied] = useState(false);
+  const fullscreen = nativeFullscreen || overlay;
 
   useEffect(() => {
-    const onChange = () => setFullscreen(document.fullscreenElement === ref.current);
+    const onChange = () => setNativeFullscreen(document.fullscreenElement === ref.current);
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOverlay(false);
+    };
     document.addEventListener("fullscreenchange", onChange);
-    return () => document.removeEventListener("fullscreenchange", onChange);
+    document.addEventListener("keydown", onKey);
+    return () => {
+      document.removeEventListener("fullscreenchange", onChange);
+      document.removeEventListener("keydown", onKey);
+    };
   }, []);
 
   async function toggleFullscreen() {
+    if (overlay) {
+      setOverlay(false);
+      return;
+    }
     try {
       if (document.fullscreenElement) await document.exitFullscreen();
-      else await ref.current?.requestFullscreen();
+      else if (ref.current?.requestFullscreen) await ref.current.requestFullscreen();
+      else setOverlay(true);
     } catch {
-      // Fullscreen can be refused (iframes, iOS Safari); the panel still works inline.
+      setOverlay(true);
     }
   }
 
@@ -43,7 +58,7 @@ export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; jo
       aria-label="Приглашение в класс"
       className={
         fullscreen
-          ? "flex min-h-[100dvh] flex-col items-center justify-center gap-10 bg-ink p-10 text-center"
+          ? `flex min-h-[100dvh] flex-col items-center justify-center gap-10 bg-ink p-10 text-center ${overlay ? "fixed inset-0 z-50 overflow-y-auto" : ""}`
           : "mt-6 grid gap-6 rounded-xl border border-line bg-surface p-5 sm:grid-cols-[auto_1fr] sm:items-center print:hidden"
       }
     >
