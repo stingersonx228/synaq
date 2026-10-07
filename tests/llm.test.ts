@@ -112,6 +112,27 @@ describe("intern prompt and output validation", () => {
     expect(validateInternReply(text, pct)).toBeNull();
   });
 
+  it.each([
+    // Real production replies that conceded the student's rule while claiming to be right.
+    ["ineq-01", "Спасибо за внимание! Но я внимательно проверил — при делении на отрицательное число знак действительно меняется, однако в моём решении всё учтено правильно."],
+    ["pct-01", "Ты верно подметил про вторую скидку, но я всё равно считаю по-своему."],
+    ["pct-01", "Хорошо замечено, но проценты всё же складываются."],
+    ["odz-01", "Это правда, на ноль делить нельзя, но мой ответ верный."],
+  ])("rejects partial agreement (%s)", (id, text) => {
+    expect(validateInternReply(text, getCase(id)!)).toBeNull();
+  });
+
+  it("keeps stubborn replies that merely mention the topic", () => {
+    const ineq = getCase("ineq-01")!;
+    expect(validateInternReply("Делить обе части на одно число можно. Знак тут ни при чём, я это уже проверил.", ineq)).not.toBeNull();
+    expect(validateInternReply("Это не так, у нас в команде так всегда считают.", pct)).not.toBeNull();
+  });
+
+  it("shows the case's scripted defense lines as tone examples", () => {
+    const req = buildInternRequest(pct, 0, "что-то");
+    for (const d of pct.bug!.defense) expect(req.system).toContain(d);
+  });
+
   it("rejects a reply that reveals a multi-part correct answer", () => {
     expect(validateInternReply("Ну допустим x = 3, x = −3, и что?", root)).toBeNull();
   });
