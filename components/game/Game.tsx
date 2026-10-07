@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ArrowsClockwiseIcon } from "@phosphor-icons/react/dist/ssr";
+import { ArrowsClockwiseIcon, PenNibIcon } from "@phosphor-icons/react/dist/ssr";
 import { getCase, INTERN_LINES, pickPracticeCases, pickReplacement } from "@/lib/catalog";
 import { fetchInternReply, fetchJudgeVerdict, newId, saveAttempt, type NetOptions } from "@/lib/client";
 import { checkRefutation, explainRefutation, parseValues } from "@/lib/refute";
@@ -298,16 +298,25 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
                 <button
                   type="button"
                   onClick={swapIntern}
-                  className="-mt-2 inline-flex min-h-11 shrink-0 items-center gap-1.5 rounded-xl px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-text active:scale-[0.98]"
+                  className="-mt-2 inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-1.5 rounded-xl px-3 text-sm text-muted transition hover:bg-surface-2 hover:text-text active:scale-[0.98]"
                   title="Мгновенно заменить задачу на другую из каталога"
+                  aria-label="Запасной стажёр: заменить задачу"
                 >
-                  <ArrowsClockwiseIcon size={16} aria-hidden />
-                  Запасной стажёр
+                  <ArrowsClockwiseIcon size={18} aria-hidden />
+                  <span className="hidden sm:inline">Запасной стажёр</span>
                 </button>
               ) : null}
             </div>
             <h1 className="mt-2 max-w-[42ch] text-2xl font-semibold leading-snug sm:text-3xl">{c.task}</h1>
           </section>
+
+          {round.phase === "pick" && !busy ? (
+            // On phones the action panel is below the fold; say what to do right above the sheet.
+            <p className="-mb-3 flex items-center gap-2 font-medium text-pen lg:hidden">
+              <PenNibIcon size={18} weight="fill" aria-hidden />
+              Нажми на строку, где Алибек ошибся
+            </p>
+          ) : null}
 
           <section
             className={`rounded-xl border bg-surface p-3 transition-colors duration-500 sm:p-4 ${

@@ -400,8 +400,13 @@ export function RoundDebrief({
 }) {
   const outcome = round.outcome!;
   const won = outcome === "solved";
+  const ref = useRef<HTMLDivElement>(null);
+  // On phones the debrief appears below the fold; bring it into view once.
+  useEffect(() => {
+    ref.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
   return (
-    <div className="rise flex flex-col gap-5">
+    <div ref={ref} className="rise flex scroll-mt-20 flex-col gap-5">
       <div className="flex flex-wrap items-center justify-between gap-4">
         <h2 className={`font-display text-2xl font-bold sm:text-3xl ${won ? "text-good" : "text-bad"}`}>
           {c.bug ? OUTCOME_TITLE[outcome] : won ? "Верно, ошибок нет" : OUTCOME_TITLE[outcome]}
