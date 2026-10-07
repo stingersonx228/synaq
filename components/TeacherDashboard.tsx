@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 import { Wordmark } from "@/components/game/ui";
 import LessonPlan from "@/components/teacher/LessonPlan";
 import PrintButton from "@/components/teacher/PrintButton";
+import RoundFeed from "@/components/teacher/RoundFeed";
 import { typeName } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import type { ClassStats } from "@/lib/stats";
@@ -69,6 +70,8 @@ export default function TeacherDashboard({
         <span className="font-mono font-semibold text-text">{stats.roundCount}</span>{" "}
         {plural(stats.roundCount, ["раунд", "раунда", "раундов"])}
       </p>
+
+      {status ? <RoundFeed rounds={stats.recent ?? []} /> : null}
 
       {stats.studentCount === 0 ? (
         <Empty>

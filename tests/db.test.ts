@@ -231,8 +231,33 @@ describe("aggregateStats", () => {
     ]);
   });
 
+  it("lists the latest rounds newest first with nicknames", () => {
+    const s = aggregateStats(
+      [
+        { id: "a", nickname: "Барыс" },
+        { id: "b", nickname: "Тулпар" },
+      ],
+      [
+        row("a", "odz", { created_at: "2026-10-01T10:00:00Z" }),
+        row("b", "lost_root", { outcome: "failed_proof", score: 0, lives_lost: 1, created_at: "2026-10-01T10:02:00Z" }),
+        row("ghost", "odz", { created_at: "2026-10-01T10:05:00Z" }),
+      ],
+    );
+    expect(s.recent).toEqual([
+      { nickname: "Тулпар", typeId: "lost_root", outcome: "failed_proof", score: 0, at: "2026-10-01T10:02:00Z" },
+      { nickname: "Барыс", typeId: "odz", outcome: "solved", score: 100, at: "2026-10-01T10:00:00Z" },
+    ]);
+  });
+
   it("handles an empty class", () => {
-    expect(aggregateStats([], [])).toEqual({ studentCount: 0, roundCount: 0, types: [], blindSpots: [], students: [] });
+    expect(aggregateStats([], [])).toEqual({
+      studentCount: 0,
+      roundCount: 0,
+      types: [],
+      blindSpots: [],
+      students: [],
+      recent: [],
+    });
   });
 });
 

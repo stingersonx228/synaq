@@ -39,12 +39,24 @@ export interface StudentStat {
 
 const STUDENT_WEAK_TYPES = 3;
 
+export interface RecentRound {
+  nickname: string;
+  typeId: string;
+  outcome: Outcome;
+  score: number;
+  at: string;
+}
+
+export const RECENT_ROUNDS = 8;
+
 export interface ClassStats {
   studentCount: number;
   roundCount: number;
   types: TypeStat[];
   blindSpots: TypeStat[];
   students: StudentStat[];
+  /** Latest rounds, newest first: the live feed on the teacher panel. */
+  recent: RecentRound[];
 }
 
 const TYPE_ORDER = [...new Set(CASES.map((c) => c.type_id))];
@@ -116,11 +128,25 @@ export function aggregateStats(students: StudentRow[], attempts: AttemptRow[]): 
       (x, y) => (y.lastActive ?? "").localeCompare(x.lastActive ?? "") || x.nickname.localeCompare(y.nickname, "ru"),
     );
 
+  const nicknames = new Map(students.map((s) => [s.id, s.nickname]));
+  const recent = attempts
+    .filter((a) => nicknames.has(a.student_id))
+    .sort((x, y) => y.created_at.localeCompare(x.created_at))
+    .slice(0, RECENT_ROUNDS)
+    .map((a) => ({
+      nickname: nicknames.get(a.student_id)!,
+      typeId: a.type_id,
+      outcome: a.outcome,
+      score: a.score,
+      at: a.created_at,
+    }));
+
   return {
     studentCount: students.length,
     roundCount: attempts.length,
     types,
     blindSpots: types.filter((t) => t.problemRounds > 0).slice(0, 3),
     students: studentStats,
+    recent,
   };
 }
