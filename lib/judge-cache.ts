@@ -4,8 +4,14 @@ import { getSupabase } from "./supabase";
 const MEMORY_MAX = 2000;
 const memory = new Map<string, boolean>();
 
-export function judgeCacheKey(caseId: string, normalizedExplanation: string): string {
-  return createHash("sha256").update(`${caseId}\n${normalizedExplanation.toLowerCase()}`).digest("hex");
+/**
+ * The verdict depends on the canonical cause it was judged against, so the cause is part of
+ * the key: editing a case in the catalog invalidates its old verdicts automatically.
+ */
+export function judgeCacheKey(caseId: string, cause: string, normalizedExplanation: string): string {
+  return createHash("sha256")
+    .update(`${caseId}\n${cause}\n${normalizedExplanation.toLowerCase()}`)
+    .digest("hex");
 }
 
 export async function getCachedVerdict(key: string): Promise<boolean | null> {

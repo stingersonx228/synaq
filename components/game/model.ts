@@ -28,6 +28,8 @@ export interface Round {
 }
 
 export interface RoundResult {
+  /** Idempotency key for the server report; stays the same across retries. */
+  attemptId: string;
   caseId: string;
   typeId: string;
   outcome: Outcome;

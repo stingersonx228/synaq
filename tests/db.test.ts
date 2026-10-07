@@ -31,6 +31,7 @@ const post = (body: unknown, ip = "10.9.0.1") =>
   });
 
 const validAttempt = {
+  attemptId: "44444444-4444-4444-8444-444444444444",
   studentId: "11111111-1111-4111-8111-111111111111",
   caseId: "pct-01",
   outcome: "solved",
@@ -127,12 +128,43 @@ describe("/api/attempt with Supabase", () => {
     supabaseMock.db = { from: () => ({ insert: async (row: unknown) => (inserted.push(row), { error: null }) }) };
     const res = await attempt(post({ ...validAttempt, score: 999 }));
     expect(await res.json()).toEqual({ ok: true, score: 100, stars: 3 });
-    expect(inserted[0]).toMatchObject({ case_id: "pct-01", type_id: "percent_add", score: 100, stars: 3 });
+    expect(inserted[0]).toMatchObject({
+      id: validAttempt.attemptId,
+      case_id: "pct-01",
+      type_id: "percent_add",
+      score: 100,
+      stars: 3,
+    });
 
     supabaseMock.db = { from: () => ({ insert: async () => ({ error: { code: "42P01", message: "secret detail" } }) }) };
     const failed = await attempt(post(validAttempt));
     expect(failed.status).toBe(500);
     expect(await failed.json()).toEqual({ error: "E_ATTEMPT" });
+  });
+
+  it("treats a retried report (same attemptId) as already saved", async () => {
+    supabaseMock.exists = true;
+    supabaseMock.db = { from: () => ({ insert: async () => ({ error: { code: "23505" } }) }) };
+    const res = await attempt(post(validAttempt));
+    expect(res.status).toBe(200);
+    expect(await res.json()).toEqual({ ok: true, score: 100, stars: 3 });
+  });
+
+  it("rejects round reports the game cannot produce", async () => {
+    supabaseMock.exists = true;
+    supabaseMock.db = { from: () => ({ insert: async () => ({ error: null }) }) };
+    const cleanWithBonus = { ...validAttempt, caseId: "lin-ok", causeOk: true, refuteTries: 0 };
+    const res = await attempt(post(cleanWithBonus));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "inconsistent_attempt" });
+    const noProof = await attempt(post({ ...validAttempt, refuteTries: 0 }));
+    expect(noProof.status).toBe(400);
+  });
+
+  it("requires an attemptId", async () => {
+    const withoutId: Partial<typeof validAttempt> = { ...validAttempt };
+    delete withoutId.attemptId;
+    expect((await attempt(post(withoutId))).status).toBe(400);
   });
 });
 

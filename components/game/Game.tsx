@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { ArrowsClockwiseIcon } from "@phosphor-icons/react/dist/ssr";
 import { getCase, INTERN_LINES, pickReplacement } from "@/lib/catalog";
-import { fetchInternReply, fetchJudgeVerdict, saveAttempt, type NetOptions } from "@/lib/client";
+import { fetchInternReply, fetchJudgeVerdict, newId, saveAttempt, type NetOptions } from "@/lib/client";
 import { checkRefutation, explainRefutation, parseValues } from "@/lib/refute";
 import { blindSpots, MAX_HINTS, MAX_REFUTE_TRIES, roundScore, stars } from "@/lib/scoring";
 import { getStudent, recordSession, setStudent, type StudentIdentity } from "@/lib/session";
@@ -50,8 +50,9 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     for (const r of game.results) {
       if (savedRef.current.has(r)) continue;
       savedRef.current.add(r);
-      const { caseId, outcome, hintsUsed, causeOk, refuteTries, livesLost } = r;
-      void saveAttempt({ studentId, caseId, outcome, hintsUsed, causeOk, refuteTries, livesLost }).then((status) => {
+      const { attemptId, caseId, outcome, hintsUsed, causeOk, refuteTries, livesLost } = r;
+      const payload = { attemptId, studentId, caseId, outcome, hintsUsed, causeOk, refuteTries, livesLost };
+      void saveAttempt(payload).then((status) => {
         if (status === "unauthorized") {
           setStudent(null);
           setStudentState(null);
@@ -83,6 +84,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
         hintsUsed: r.hintsUsed,
       });
       const result: RoundResult = {
+        attemptId: newId(),
         caseId: r.caseId,
         typeId: c.type_id,
         outcome,

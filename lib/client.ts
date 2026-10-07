@@ -68,7 +68,18 @@ export async function fetchJudgeVerdict(caseId: string, explanation: string, net
   return typeof data?.verdict === "boolean" ? data.verdict : fallback;
 }
 
+/** Random UUID v4. crypto.randomUUID needs a secure context, which a LAN http address is not. */
+export function newId(): string {
+  if (typeof crypto.randomUUID === "function") return crypto.randomUUID();
+  const b = crypto.getRandomValues(new Uint8Array(16));
+  b[6] = (b[6] & 0x0f) | 0x40;
+  b[8] = (b[8] & 0x3f) | 0x80;
+  const h = Array.from(b, (x) => x.toString(16).padStart(2, "0")).join("");
+  return `${h.slice(0, 8)}-${h.slice(8, 12)}-${h.slice(12, 16)}-${h.slice(16, 20)}-${h.slice(20)}`;
+}
+
 export interface AttemptPayload {
+  attemptId: string;
   studentId: string;
   caseId: string;
   outcome: Outcome;
@@ -78,12 +89,28 @@ export interface AttemptPayload {
   livesLost: number;
 }
 
-/** "saved" | "unauthorized" (student no longer exists) | "unavailable" (no DB / network). */
-export async function saveAttempt(payload: AttemptPayload): Promise<"saved" | "unauthorized" | "unavailable"> {
-  const res = await postJson("/api/attempt", payload);
-  if (res?.ok) return "saved";
-  if (res?.status === 401) return "unauthorized";
-  return "unavailable";
+export const ATTEMPT_RETRY_DELAYS_MS = [1000, 3000, 9000];
+
+/** Network failures, 429 and 5xx (except 503 "no database") are worth retrying. */
+function isTransient(res: Response | null): boolean {
+  return res === null || res.status === 429 || (res.status >= 500 && res.status !== 503);
+}
+
+/**
+ * "saved" | "unauthorized" (student no longer exists) | "unavailable" (no DB, or still failing
+ * after retries). Retries are safe: the server stores each attemptId at most once.
+ */
+export async function saveAttempt(
+  payload: AttemptPayload,
+  delays: readonly number[] = ATTEMPT_RETRY_DELAYS_MS,
+): Promise<"saved" | "unauthorized" | "unavailable"> {
+  for (let i = 0; ; i++) {
+    const res = await postJson("/api/attempt", payload);
+    if (res?.ok) return "saved";
+    if (res?.status === 401) return "unauthorized";
+    if (!isTransient(res) || i >= delays.length) return "unavailable";
+    await new Promise((r) => setTimeout(r, delays[i]));
+  }
 }
 
 export type JoinResult =

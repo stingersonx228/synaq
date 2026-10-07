@@ -70,6 +70,8 @@ export async function loadClassDashboard(db: SupabaseClient, token: string): Pro
       .select("student_id, type_id, outcome, score, hints_used, lives_lost, created_at, students!inner(class_id)")
       .eq("students.class_id", cls.id)
       .order("created_at", { ascending: false })
+      // Tie-breaker: without it rows with equal timestamps can repeat or vanish across pages.
+      .order("id", { ascending: true })
       .range(page * PAGE, page * PAGE + PAGE - 1)
       .returns<AttemptWithClass[]>();
     if (aErr) throw new Error(`attempts lookup failed: ${aErr.code}`);

@@ -47,8 +47,11 @@ export async function takeLlmCall(who: { studentId: string | null; ip: string },
       const { error: insertError } = await db.from("llm_calls").insert({ student_id: who.studentId });
       if (insertError) throw new Error(insertError.code);
       // Rows older than the window are useless; prune them now and then instead of on every call.
+      // Fire-and-forget: a failed prune must not fall through and count the call a second time.
       if (Math.random() < PRUNE_PROBABILITY) {
-        await db.from("llm_calls").delete().lt("created_at", new Date(now - 2 * HOUR_MS).toISOString());
+        void Promise.resolve(
+          db.from("llm_calls").delete().lt("created_at", new Date(now - 2 * HOUR_MS).toISOString()),
+        ).catch(() => undefined);
       }
       return true;
     } catch {
@@ -64,6 +67,8 @@ const SPAM_LIMITS = {
   join: { limit: 120, windowMs: 10 * MINUTE_MS },
   createClass: { limit: 10, windowMs: HOUR_MS },
   stats: { limit: 120, windowMs: 10 * MINUTE_MS },
+  // 30 students x 6 rounds plus retries, from one school IP.
+  attempt: { limit: 600, windowMs: 10 * MINUTE_MS },
 } as const;
 
 /** Per-IP anti-spam limit for endpoints that write to or scan the database. */

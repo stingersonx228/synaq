@@ -59,7 +59,7 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
     const lastSeen = NOW - Math.floor(rng() * 9 * 24) * HOUR;
     for (let r = 0; r < rounds; r++) {
       const c = pick(CASES);
-      const pProblem = Math.min(0.95, Math.max(0.03, DIFFICULTY[c.type_id] - skill));
+      const pProblem = Math.min(0.95, Math.max(0.03, (DIFFICULTY[c.type_id] ?? 0.3) - skill));
       const problem = rng() < pProblem;
       let outcome: Outcome = "solved";
       let hints = rng() < 0.3 ? 1 + Math.floor(rng() * 2) : 0;

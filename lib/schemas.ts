@@ -53,6 +53,8 @@ export const JoinBody = z.object({
 });
 
 export const AttemptBody = z.object({
+  /** Client-generated id of the round report; retries reuse it, so a report is stored once. */
+  attemptId: z.uuid(),
   studentId,
   caseId: z
     .string()

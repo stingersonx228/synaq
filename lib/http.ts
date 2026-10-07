@@ -29,9 +29,14 @@ export async function readBody<T extends z.ZodType>(
   return { ok: true, data: parsed.data };
 }
 
+/**
+ * Client IP for rate limiting. Vercel sets x-real-ip itself; the first x-forwarded-for entry
+ * can be supplied by the client on other hosts, so it is only a fallback.
+ */
 export function clientIp(request: Request): string {
-  const fwd = request.headers.get("x-forwarded-for");
-  return fwd?.split(",")[0]?.trim() || request.headers.get("x-real-ip") || "unknown";
+  const real = request.headers.get("x-real-ip")?.trim();
+  if (real) return real;
+  return request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
 }
 
 /** Collapses whitespace and trims; used before length checks and cache keys. */

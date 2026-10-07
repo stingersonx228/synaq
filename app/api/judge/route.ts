@@ -20,7 +20,7 @@ export async function POST(request: Request): Promise<Response> {
   if (!student.ok) return jsonError(401, "unknown_student");
 
   try {
-    const key = judgeCacheKey(caseId, explanation);
+    const key = judgeCacheKey(caseId, c.bug!.cause, explanation);
     const cached = await getCachedVerdict(key).catch(() => null);
     if (cached !== null) return reply(cached, "cache");
 
