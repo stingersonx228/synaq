@@ -31,13 +31,18 @@ export default function InvitePanel({ code, joinUrl, qrSvg }: { code: string; jo
       setOverlay(false);
       return;
     }
-    try {
-      if (document.fullscreenElement) await document.exitFullscreen();
-      else if (ref.current?.requestFullscreen) await ref.current.requestFullscreen();
-      else setOverlay(true);
-    } catch {
-      setOverlay(true);
+    if (document.fullscreenElement) {
+      await document.exitFullscreen().catch(() => undefined);
+      return;
     }
+    const el = ref.current;
+    try {
+      // Some embedded browsers neither reject nor actually enter fullscreen; give up after 1 s.
+      await Promise.race([el?.requestFullscreen(), new Promise((resolve) => setTimeout(resolve, 1000))]);
+    } catch {
+      // Refused: handled below.
+    }
+    if (!el || document.fullscreenElement !== el) setOverlay(true);
   }
 
   async function copy() {
