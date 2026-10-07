@@ -1,10 +1,12 @@
-import { jsonError, readBody } from "@/lib/http";
+import { clientIp, jsonError, readBody } from "@/lib/http";
+import { allowRequest } from "@/lib/ratelimit";
 import { JoinBody } from "@/lib/schemas";
 import { getSupabase } from "@/lib/supabase";
 
 export async function POST(request: Request): Promise<Response> {
   const body = await readBody(request, JoinBody);
   if (!body.ok) return body.response;
+  if (!allowRequest("join", clientIp(request))) return jsonError(429, "too_many_requests");
   const db = getSupabase();
   if (!db) return jsonError(503, "db_unavailable");
   const { code, nickname } = body.data;

@@ -50,7 +50,7 @@ export default function CreateClassForm() {
           value={name}
           onChange={(e) => setName(e.target.value.slice(0, 60))}
           placeholder="Например, 9 «Б», алгебра"
-          className="rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-accent"
+          className="w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-accent"
         />
       </label>
       {state.kind === "error" ? (

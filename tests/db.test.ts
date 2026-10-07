@@ -11,17 +11,22 @@ const supabaseMock = vi.hoisted(() => ({
 vi.mock("../lib/supabase", () => ({
   getSupabase: () => supabaseMock.db,
   studentExists: async () => supabaseMock.exists,
+  resolveOptionalStudent: async (id: string | undefined) =>
+    !id || !supabaseMock.db ? { ok: true, studentId: null } : supabaseMock.exists ? { ok: true, studentId: id } : { ok: false },
 }));
 
 const { POST: join } = await import("../app/api/join/route");
 const { POST: attempt } = await import("../app/api/attempt/route");
 const { POST: createClass } = await import("../app/api/teacher/class/route");
 const { GET: stats } = await import("../app/api/teacher/[token]/stats/route");
+const { POST: judge } = await import("../app/api/judge/route");
+const { POST: intern } = await import("../app/api/intern/route");
+const { resetMemoryLimits } = await import("../lib/ratelimit");
 
-const post = (body: unknown) =>
+const post = (body: unknown, ip = "10.9.0.1") =>
   new Request("http://localhost/api", {
     method: "POST",
-    headers: { "content-type": "application/json" },
+    headers: { "content-type": "application/json", "x-forwarded-for": ip },
     body: JSON.stringify(body),
   });
 
@@ -38,6 +43,52 @@ const validAttempt = {
 afterEach(() => {
   supabaseMock.db = null;
   supabaseMock.exists = false;
+  resetMemoryLimits();
+});
+
+describe("request guards", () => {
+  it("rejects bodies over 4 KB with 413", async () => {
+    const res = await join(post({ code: "K7M2QX", nickname: "Барыс", pad: "x".repeat(5000) }));
+    expect(res.status).toBe(413);
+  });
+
+  it("rejects malformed JSON with 400", async () => {
+    const res = await join(new Request("http://localhost/api", { method: "POST", body: "{nope" }));
+    expect(res.status).toBe(400);
+    expect(await res.json()).toEqual({ error: "invalid_json" });
+  });
+
+  it("limits join attempts per IP", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 121; i++) statuses.push((await join(post({ code: "K7M2QX", nickname: "Барыс" }, "10.9.9.9"))).status);
+    expect(statuses.slice(0, 120).every((s) => s === 503)).toBe(true);
+    expect(statuses[120]).toBe(429);
+    expect((await join(post({ code: "K7M2QX", nickname: "Барыс" }, "10.9.9.10"))).status).toBe(503);
+  });
+
+  it("limits class creation per IP", async () => {
+    const statuses: number[] = [];
+    for (let i = 0; i < 11; i++) statuses.push((await createClass(post({ name: "9Б" }, "10.8.8.8"))).status);
+    expect(statuses[9]).toBe(503);
+    expect(statuses[10]).toBe(429);
+  });
+
+  it("LLM routes reject an unknown student id with 401", async () => {
+    supabaseMock.db = {};
+    supabaseMock.exists = false;
+    const studentId = "22222222-2222-4222-8222-222222222222";
+    const j = await judge(post({ caseId: "pct-01", explanation: "вторая скидка от новой цены", studentId }));
+    expect(j.status).toBe(401);
+    const i = await intern(post({ caseId: "pct-01", stage: 0, explanation: "вторая скидка от новой цены", studentId }));
+    expect(i.status).toBe(401);
+  });
+
+  it("LLM routes still answer anonymous players", async () => {
+    vi.stubEnv("LLM_DISABLED", "1");
+    const j = await judge(post({ caseId: "pct-01", explanation: "вторая скидка от сниженной цены" }));
+    expect(await j.json()).toEqual({ verdict: true, source: "fallback" });
+    vi.unstubAllEnvs();
+  });
 });
 
 describe("routes without Supabase", () => {

@@ -10,9 +10,11 @@
 - The scripted judge fallback needs one keyword root; keywords are normalized (lowercase, ё→е, unified minus).
 - Judge majority needs ≥2 valid votes and a strict majority; only LLM verdicts are cached.
 - LLM budget counts one unit per `/api/judge` or `/api/intern` request that reaches the provider (cache hits are free). Anonymous players are limited per IP in memory.
-- The 401 rule for unknown `student_id` applies to `/api/attempt`; LLM routes accept an optional id only for rate limiting.
+- Unknown `student_id` → 401 on every route that receives one (`/api/attempt`, `/api/judge`, `/api/intern`); the LLM routes also work without an id (anonymous play). On a DB error the LLM routes continue anonymously rather than break the game.
 - The attempt score is recomputed on the server; the client never sends it.
 - Joining with an existing nickname in the same class returns the same student (lets a student continue on another device).
 - "Запасной стажёр" swaps to an unused case of the same kind (clean/buggy) when available, without penalty.
 - System font stack instead of next/font to keep builds working without network access.
 - Supabase migration was not applied: the connected project's DB timed out and the other projects in the account are unrelated.
+- Request bodies are capped at 4 KB (413). Per-IP anti-spam windows in memory: join 120/10 min (a class shares one school IP), class creation 10/hour, dashboard reads 120/10 min.
+- `llm_calls` rows older than 2 hours are pruned opportunistically (2% of inserts).

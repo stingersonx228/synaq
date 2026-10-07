@@ -12,7 +12,7 @@ export default function TeacherPage() {
       <Link href="/" className="font-semibold text-accent">
         ← Обратный экзамен
       </Link>
-      <div className="mt-6 grid items-start gap-10 lg:grid-cols-[1fr_1fr]">
+      <div className="mt-6 grid grid-cols-1 items-start gap-10 lg:grid-cols-[1fr_1fr] [&>*]:min-w-0">
         <section>
           <h1 className="text-4xl font-bold leading-tight">Панель учителя</h1>
           <p className="mt-4 text-xl leading-relaxed text-muted">

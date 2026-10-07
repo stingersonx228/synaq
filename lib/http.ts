@@ -5,14 +5,22 @@ export function jsonError(status: number, error: string): Response {
   return Response.json({ error }, { status });
 }
 
-/** Parses and validates a JSON body. Returns the data or a ready 400 response. */
+const MAX_BODY_BYTES = 4096;
+
+/** Parses and validates a small JSON body. Returns the data or a ready 4xx response. */
 export async function readBody<T extends z.ZodType>(
   request: Request,
   schema: T,
 ): Promise<{ ok: true; data: z.infer<T> } | { ok: false; response: Response }> {
+  const declared = Number(request.headers.get("content-length"));
+  if (declared > MAX_BODY_BYTES) return { ok: false, response: jsonError(413, "body_too_large") };
   let raw: unknown;
   try {
-    raw = await request.json();
+    const text = await request.text();
+    if (new TextEncoder().encode(text).length > MAX_BODY_BYTES) {
+      return { ok: false, response: jsonError(413, "body_too_large") };
+    }
+    raw = JSON.parse(text);
   } catch {
     return { ok: false, response: jsonError(400, "invalid_json") };
   }

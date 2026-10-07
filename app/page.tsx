@@ -11,7 +11,7 @@ const STEPS = [
 export default function Home() {
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-10 sm:py-16">
-      <div className="grid items-start gap-10 lg:grid-cols-[1.2fr_1fr]">
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-[1.2fr_1fr] [&>*]:min-w-0">
         <section>
           <p className="font-semibold text-accent">Обратный экзамен</p>
           <h1 className="mt-2 text-4xl font-bold leading-tight sm:text-5xl">

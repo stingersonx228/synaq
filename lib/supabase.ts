@@ -21,3 +21,20 @@ export async function studentExists(db: SupabaseClient, studentId: string): Prom
   if (error) throw new Error(`students lookup failed: ${error.code}`);
   return data !== null;
 }
+
+export type StudentCheck = { ok: true; studentId: string | null } | { ok: false };
+
+/**
+ * Resolves an optional student id for routes that also work anonymously (LLM routes).
+ * Unknown ids are rejected; without a database, or on a database error, the caller
+ * proceeds anonymously so the game never breaks.
+ */
+export async function resolveOptionalStudent(studentId: string | undefined): Promise<StudentCheck> {
+  const db = getSupabase();
+  if (!studentId || !db) return { ok: true, studentId: null };
+  try {
+    return (await studentExists(db, studentId)) ? { ok: true, studentId } : { ok: false };
+  } catch {
+    return { ok: true, studentId: null };
+  }
+}

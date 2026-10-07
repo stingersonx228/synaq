@@ -88,7 +88,7 @@ export async function saveAttempt(payload: AttemptPayload): Promise<"saved" | "u
 
 export type JoinResult =
   | { ok: true; studentId: string; nickname: string; className: string }
-  | { ok: false; error: "class_not_found" | "invalid" | "unavailable" };
+  | { ok: false; error: "class_not_found" | "invalid" | "rate_limited" | "unavailable" };
 
 export async function joinClass(code: string, nickname: string): Promise<JoinResult> {
   const res = await postJson("/api/join", { code, nickname });
@@ -103,5 +103,6 @@ export async function joinClass(code: string, nickname: string): Promise<JoinRes
   }
   if (res?.status === 404) return { ok: false, error: "class_not_found" };
   if (res?.status === 400) return { ok: false, error: "invalid" };
+  if (res?.status === 429) return { ok: false, error: "rate_limited" };
   return { ok: false, error: "unavailable" };
 }

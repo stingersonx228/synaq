@@ -1,19 +1,23 @@
 import { getCase } from "@/lib/catalog";
-import { clientIp, readBody } from "@/lib/http";
+import { clientIp, jsonError, readBody } from "@/lib/http";
 import { internWithLlm, llmEnabled } from "@/lib/llm";
 import { takeLlmCall } from "@/lib/ratelimit";
 import { InternBody } from "@/lib/schemas";
+import { resolveOptionalStudent } from "@/lib/supabase";
 import type { Case } from "@/lib/types";
 
 export async function POST(request: Request): Promise<Response> {
   const body = await readBody(request, InternBody);
   if (!body.ok) return body.response;
-  const { caseId, stage, explanation, studentId } = body.data;
+  const { caseId, stage, explanation } = body.data;
   const c = getCase(caseId) as Case;
   const fallback = c.bug!.defense[stage];
 
+  const student = await resolveOptionalStudent(body.data.studentId);
+  if (!student.ok) return jsonError(401, "unknown_student");
+
   try {
-    if (llmEnabled() && (await takeLlmCall({ studentId: studentId ?? null, ip: clientIp(request) }))) {
+    if (llmEnabled() && (await takeLlmCall({ studentId: student.studentId, ip: clientIp(request) }))) {
       const reply = await internWithLlm(c, stage, explanation);
       if (reply) return Response.json({ reply, source: "llm" });
     }

@@ -34,6 +34,7 @@ export default function JoinForm() {
     setPending(false);
     if (res.error === "class_not_found") setError("Класс с таким кодом не найден. Проверь код у учителя.");
     else if (res.error === "invalid") setError("Проверь код класса и псевдоним.");
+    else if (res.error === "rate_limited") setError("Слишком много попыток входа. Подожди пару минут.");
     else {
       // No database or no network: play locally without bothering the student.
       setStudent(null);
@@ -52,7 +53,7 @@ export default function JoinForm() {
           autoComplete="off"
           autoCapitalize="characters"
           spellCheck={false}
-          className="rounded-xl border border-line bg-ink px-4 py-3 font-mono text-xl uppercase tracking-[0.3em] outline-none focus:border-accent"
+          className="w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 font-mono text-xl uppercase tracking-[0.3em] outline-none focus:border-accent"
         />
       </label>
       <label className="flex flex-col gap-1">
@@ -62,7 +63,7 @@ export default function JoinForm() {
           onChange={(e) => setNickname(e.target.value.slice(0, NICK_MAX))}
           placeholder="Например, Барыс_42"
           autoComplete="off"
-          className="rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-accent"
+          className="w-full min-w-0 rounded-xl border border-line bg-ink px-4 py-3 text-xl outline-none focus:border-accent"
         />
         <span className="text-sm text-muted">Не пиши настоящее имя — учитель узнает тебя по псевдониму.</span>
       </label>
