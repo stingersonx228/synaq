@@ -127,6 +127,9 @@ describe("intern prompt and output validation", () => {
     ["odz-01", "Да, но я же решал через числитель! Когда числитель равен нулю, дробь сразу равна нулю."],
     ["sign-01", "Я перенёс -5 вправо и изменил знак на плюс, получилось 3 + 5 = 8. Проверил несколько раз — всё правильно!"],
     ["pct-01", "Нет, 20 000 × 0,8 × 0,9 даёт почти то же самое, так что разницы нет."],
+    ["sign-01", "Совершенно верно, при переносе знак меняется! Я перенёс −5 вправо, поэтому у меня 3 − 5 = −2."],
+    ["pct-01", "Верно. Но я всё равно складываю скидки."],
+    ["ineq-01", "Хм. Правильно, знак меняется, но не в моём случае."],
   ])("rejects agreement openers and recalculations (%s)", (id, text) => {
     expect(validateInternReply(text, getCase(id)!)).toBeNull();
   });
@@ -139,6 +142,9 @@ describe("intern prompt and output validation", () => {
       validateInternReply("Я переносил -5 вправо, получилось 3 − 5 = −2, а потом x = 0,5. Всё правильно!", getCase("sign-01")!),
     ).not.toBeNull();
     expect(validateInternReply("Делим на −2, знак оставляем. Ответ x > −3 точный.", getCase("ineq-01")!)).not.toBeNull();
+    expect(
+      validateInternReply("Я делил обе части на −2 и получил x > −3. Мой расчёт верный, это правильно.", getCase("ineq-01")!),
+    ).not.toBeNull();
   });
 
   it("keeps stubborn replies that merely mention the topic", () => {

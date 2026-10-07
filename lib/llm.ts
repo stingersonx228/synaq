@@ -174,6 +174,8 @@ const CONCEDE_MARKERS = [
   /это правда/,
   /(?<!не )так и есть/,
   /^да[\s,.!…]/,
+  // A sentence that opens with "Верно!", "Совершенно верно," etc. agrees with the student.
+  /(^|[.!?…]\s*)((совершенно|абсолютно|вполне|да)\s+)?(верно|правильно|точно|согласен)[\s,.!…]/,
 ];
 
 /** Numbers written in a text, with digit-group spaces removed and comma decimals unified. */
