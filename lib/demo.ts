@@ -28,6 +28,14 @@ const DIFFICULTY: Record<string, number> = {
   sqrt_sum: 0.34,
   power_mult: 0.29,
   cancel_terms: 0.33,
+  ap_formula: 0.38,
+  neg_exponent: 0.46,
+  avg_speed: 0.57,
+  joint_work: 0.52,
+  vieta_sign: 0.35,
+  sqrt_abs: 0.49,
+  exp_divide: 0.43,
+  sin_sum: 0.4,
 };
 
 const NICK_ROOTS = ["Барыс", "Қыран", "Тұлпар", "Арлан", "Самұрық", "Бүркіт", "Жұлдыз", "Сұңқар", "Шағала", "Көкжал"];
@@ -60,7 +68,7 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
 
     // Skill shifts every difficulty by up to ±0.2 so students differ visibly.
     const skill = (rng() - 0.5) * 0.4;
-    const rounds = 4 + Math.floor(rng() * 15);
+    const rounds = 8 + Math.floor(rng() * 17);
     // Uneven timestamps: real classes do not play on the hour or every 7 minutes exactly.
     const lastSeen = NOW - Math.floor(rng() * 9 * 24 * 60) * 60 * 1000;
     let at = lastSeen;
@@ -81,7 +89,7 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
         if (outcome !== "solved") livesLost = 1;
       }
       const refuteTries = c.bug && outcome === "solved" ? 1 + Math.floor(rng() * 2) : 0;
-      const causeOk = c.bug && outcome === "solved" ? rng() < 0.7 - skill : null;
+      const causeOk = c.bug && outcome === "solved" ? rng() < 0.82 - skill / 2 : null;
       const score = roundScore({ outcome, clean: c.bug === null, causeOk, refuteTries, hintsUsed: hints });
       at -= Math.floor((2 + rng() * 9) * 60 * 1000 + rng() * 59 * 1000);
       attempts.push({

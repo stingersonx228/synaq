@@ -141,7 +141,9 @@ describe("pickPracticeCases", () => {
 
   it("prefers an unplayed case when a type has several", () => {
     for (let i = 0; i < 20; i++) {
-      expect(pickPracticeCases(["clean"], ["lin-ok"])).toContain("pct-ok");
+      const ids = pickPracticeCases(["clean"], ["lin-ok"]);
+      expect(ids.some((id) => id !== "lin-ok" && getCase(id)!.bug === null)).toBe(true);
+      expect(ids).not.toContain("lin-ok");
     }
   });
 
