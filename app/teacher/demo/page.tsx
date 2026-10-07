@@ -3,7 +3,7 @@ import TeacherDashboard from "@/components/TeacherDashboard";
 import { DEMO_CLASS, demoClassStats } from "@/lib/demo";
 
 export const metadata: Metadata = {
-  title: "Демо-панель учителя | Обратный экзамен",
+  title: "Демо-панель учителя | Synaq",
 };
 
 export default function TeacherDemoPage() {

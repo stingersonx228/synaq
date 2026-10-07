@@ -4,8 +4,8 @@ import { HeartIcon, RobotIcon, StarIcon } from "@phosphor-icons/react/dist/ssr";
 
 export function Wordmark({ className = "" }: { className?: string }) {
   return (
-    <Link href="/" className={`font-display text-sm font-bold tracking-tight text-text sm:text-base ${className}`}>
-      Обратный <span className="text-pen">экзамен</span>
+    <Link href="/" className={`font-display text-lg font-bold tracking-tight text-text sm:text-xl ${className}`}>
+      Syna<span className="text-pen">q</span>
     </Link>
   );
 }

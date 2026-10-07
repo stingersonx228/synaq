@@ -8,7 +8,7 @@ import { loadClassDashboard, type ClassDashboard } from "@/lib/teacher";
 
 // The URL carries the teacher secret: keep it out of search engines and Referer headers.
 export const metadata: Metadata = {
-  title: "Панель учителя | Обратный экзамен",
+  title: "Панель учителя | Synaq",
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };

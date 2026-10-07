@@ -7,7 +7,7 @@ const unbounded = Unbounded({ subsets: ["latin", "cyrillic"], variable: "--font-
 const jetbrains = JetBrains_Mono({ subsets: ["latin", "cyrillic"], variable: "--font-jetbrains" });
 
 export const metadata: Metadata = {
-  title: "Обратный экзамен",
+  title: "Synaq",
   description: "Игра по алгебре: ИИ-стажёр Алибек ошибается, а ты находишь ошибку и доказываешь её контрпримером.",
 };
 

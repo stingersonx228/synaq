@@ -4,7 +4,7 @@ import CreateClassForm from "@/components/CreateClassForm";
 import { Wordmark } from "@/components/game/ui";
 
 export const metadata: Metadata = {
-  title: "Для учителя | Обратный экзамен",
+  title: "Для учителя | Synaq",
 };
 
 export default function TeacherPage() {
