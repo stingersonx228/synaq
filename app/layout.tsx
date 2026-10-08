@@ -24,7 +24,7 @@ export const metadata: Metadata = {
     locale: "ru_RU",
     type: "website",
   },
-  twitter: { card: "summary", title: "Synaq: ИИ ошибся. Докажи это.", description: DESCRIPTION },
+  twitter: { card: "summary_large_image", title: "Synaq: ИИ ошибся. Докажи это.", description: DESCRIPTION },
 };
 
 export const viewport: Viewport = {
