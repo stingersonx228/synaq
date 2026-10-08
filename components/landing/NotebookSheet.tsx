@@ -1,6 +1,6 @@
 import { keepNumbersTogether } from "@/lib/format";
 import type { Case } from "@/lib/types";
-import { GradeCircle, MarginCross } from "./PenMarks";
+import { GradeCircle, MarginCross } from "@/components/PenMarks";
 
 /**
  * The landing preview: the intern's solution in blue ballpoint on a squared notebook page,

@@ -14,9 +14,9 @@
 - The attempt score is recomputed on the server; the client never sends it.
 - Joining with an existing nickname in the same class returns the same student (lets a student continue on another device).
 - "Запасной стажёр" swaps to an unused case of the same kind (clean/buggy) when available, without penalty.
-- UI redesign ("red pen on someone else's exam"): one accent color, Unbounded for headings, Geist for text, JetBrains Mono for line numbers and numbers, all via next/font (self-hosted at build time; the build needs network access to Google Fonts). Unbounded is loaded as a variable font because explicit weights break the Turbopack build.
-- Icons: @phosphor-icons/react (SSR entry), no hand-drawn SVG.
-- Dark theme only, as the spec requires a dark default and the main use is a stage projector.
+- Visual language (2026-10-08, chosen by the owner after the first design read as generic AI dark-neon): a squared school notebook checked with a red pen. Cool white sheet with a blue grid (deliberately not cream paper), red margin line, blue-black ink for text, blue ballpoint handwriting (Caveat) for Alibek, red pen for every student mark (cross on a wrong line, tick on a right one, a circled grade when the round is won), PT Serif for textbook headings, Geist for UI text, JetBrains Mono for numbers. All fonts via next/font (self-hosted at build time; the build needs network access to Google Fonts).
+- Icons: @phosphor-icons/react (SSR entry) for UI controls; red-pen marks are hand-drawn SVG paths (`components/PenMarks.tsx`) that draw themselves only when the page is on screen at load (`.pen-anim`), so background tabs, link previews and screenshots always show them.
+- Light theme only. The spec asked for a dark default; the owner replaced it with the notebook look, which also reads better on projectors in a daylit classroom.
 - Production database: a dedicated free Supabase project `synaq` in eu-central-1 (the project this session was first connected to never answered, and the other projects in the account belong to unrelated apps). Vercel functions run in fra1 next to it.
 - Request bodies are capped at 4 KB (413). Per-IP anti-spam windows in memory: join 120/10 min (a class shares one school IP), class creation 10/hour, dashboard reads 120/10 min.
 - `llm_calls` rows older than 2 hours are pruned opportunistically (2% of inserts).
@@ -30,7 +30,7 @@
 - "Что разобрать на уроке" turns the top blind spots into a short lesson plan from the catalog's own cause/fix/task/hint; the panel prints as a light-theme report.
 - Catalog grew to 18 cases (16 error types, 2 clean cases): powers, square root of a sum, absolute value, quadratic formula sign, logarithm sum, cancelling terms, a second clean percent case. The "exactly one clean case among 11" rule now reads "at least one clean case"; sessions still contain exactly one.
 - "Потренировать слепые пятна" starts a practice session: one case per weak type (an unplayed one when the type has several), topped up to 4 rounds with fresh cases.
-- Confetti on Alibek's concession is CSS-only, deterministic and hidden under prefers-reduced-motion.
+- No confetti: when Alibek concedes the student grades the solution in red pen (a circled 2; a 5 for an honest clean solution).
 - The landing page answers the jury's main question ("why not just ask ChatGPT to play dumb") with facts computed from the catalog, not marketing numbers.
 - Per-student weak types (top 3 by problem rounds) show in the teacher's student table; blind spots on the session summary expand into the cause and fix of the case the student actually played.
 - After an independent critic review: the judge's final verdict is "LLM or keyword roots" (the cause only earns bonus points, so a false rejection is worse than leniency; the cache stores the raw LLM verdict), and the judge prompt asks for the gist in the student's own words, with examples.

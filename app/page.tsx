@@ -1,24 +1,16 @@
 import Link from "next/link";
-import { Caveat, PT_Serif } from "next/font/google";
 import { ArrowRightIcon, ChalkboardTeacherIcon } from "@phosphor-icons/react/dist/ssr";
 import JoinForm from "@/components/JoinForm";
 import NotebookSheet from "@/components/landing/NotebookSheet";
-import { Tick, Underline } from "@/components/landing/PenMarks";
+import { Tick, Underline } from "@/components/PenMarks";
 import { buttonClass, Wordmark } from "@/components/game/ui";
 import { CASES, getCase } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import { codeFromParam } from "@/lib/schemas";
 
-// Loaded here, not in the root layout: only the landing page writes by hand.
-const hand = Caveat({ subsets: ["latin", "cyrillic"], variable: "--font-caveat" });
-const book = PT_Serif({ subsets: ["latin", "cyrillic"], weight: ["400", "700"], variable: "--font-pt-serif" });
-
 // Not the stage demo case (pct-01): the landing must not give away the answer the jury sees later.
 const PREVIEW = getCase("pct-03")!;
 const PREVIEW_NOTE = "50% от 300 000, а не от 200 000";
-
-// Runs while the HTML is parsed, before the marks are painted (see .pen-anim in globals.css).
-const PEN_ANIM_SCRIPT = `if(document.visibilityState==="visible"&&!matchMedia("(prefers-reduced-motion: reduce)").matches)document.documentElement.classList.add("pen-anim")`;
 
 const BUGGY = CASES.filter((c) => c.bug !== null);
 const ERROR_TYPES = new Set(BUGGY.map((c) => c.type_id)).size;
@@ -52,10 +44,9 @@ const FLOW = [
 export default async function Home({ searchParams }: PageProps<"/">) {
   const initialCode = codeFromParam((await searchParams).code);
   return (
-    <div className={`notebook ${hand.variable} ${book.variable} flex min-h-[100dvh] flex-col`}>
-      <script dangerouslySetInnerHTML={{ __html: PEN_ANIM_SCRIPT }} />
+    <div className="flex min-h-[100dvh] flex-col">
       <header className="mx-auto flex h-16 w-full max-w-6xl items-center justify-between px-4 sm:px-6">
-        <Wordmark tone="ink" />
+        <Wordmark />
         <Link
           href="/teacher"
           className="-mr-3 inline-flex min-h-11 items-center gap-2 rounded-xl px-3 font-medium text-muted transition hover:bg-surface-2 hover:text-text"
@@ -68,7 +59,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
       <main className="flex-1">
         <section className="mx-auto grid w-full max-w-6xl grid-cols-1 items-center gap-12 px-4 pb-20 pt-8 sm:px-6 lg:grid-cols-[1fr_1.1fr] lg:gap-14 lg:pt-14 [&>*]:min-w-0">
           <div>
-            <h1 className="font-book text-[clamp(2.75rem,6.5vw,4.75rem)] font-bold leading-[1.02]">
+            <h1 className="font-display text-[clamp(2.75rem,6.5vw,4.75rem)] font-bold leading-[1.02]">
               ИИ ошибся.
               <br />
               <span className="relative inline-block">
@@ -103,7 +94,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           <ol className="mx-auto grid w-full max-w-6xl grid-cols-1 divide-y divide-line px-4 sm:px-6 md:grid-cols-3 md:divide-x md:divide-y-0">
             {FLOW.map(([verb, text, mark], i) => (
               <li key={verb} className={`py-9 md:py-12 ${i === 0 ? "md:pr-10" : i === 1 ? "md:px-10" : "md:pl-10"}`}>
-                <h2 className="font-book text-3xl font-bold">{verb}</h2>
+                <h2 className="font-display text-3xl font-bold">{verb}</h2>
                 <p className="mt-3 max-w-[36ch] text-lg leading-relaxed text-muted">{text}</p>
                 <p className="mt-4 -rotate-1 font-hand text-[1.7rem] leading-tight text-pen" aria-hidden>
                   {mark}
@@ -115,7 +106,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
 
         <section className="mx-auto grid w-full max-w-6xl grid-cols-1 gap-10 px-4 pt-20 sm:px-6 lg:grid-cols-[1fr_1.4fr] [&>*]:min-w-0">
           <div>
-            <h2 className="font-book text-3xl font-bold leading-tight sm:text-4xl">
+            <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">
               Это не «попроси ChatGPT притвориться глупым»
             </h2>
             <p className="mt-4 max-w-[44ch] text-lg leading-relaxed text-muted">
@@ -128,7 +119,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               <li key={title} className="grid grid-cols-[2.25rem_1fr] gap-3 py-5">
                 <Tick className="mt-0.5 h-7 w-7 text-pen" />
                 <div>
-                  <h3 className="font-book text-xl font-bold">{title}</h3>
+                  <h3 className="font-display text-xl font-bold">{title}</h3>
                   <p className="mt-1 max-w-[60ch] leading-relaxed text-muted">{text}</p>
                 </div>
               </li>
@@ -141,7 +132,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
           className="mx-auto grid w-full max-w-6xl scroll-mt-8 grid-cols-1 gap-10 px-4 py-20 sm:px-6 lg:grid-cols-[1fr_28rem] [&>*]:min-w-0"
         >
           <div>
-            <h2 className="font-book text-3xl font-bold leading-tight sm:text-4xl">Играешь с классом?</h2>
+            <h2 className="font-display text-3xl font-bold leading-tight sm:text-4xl">Играешь с классом?</h2>
             <p className="mt-4 max-w-[46ch] text-lg leading-relaxed text-muted">
               Введи код от учителя и придумай псевдоним. Учитель увидит, какие ошибки класс пропускает, но не твоё
               настоящее имя: его мы не спрашиваем.
@@ -158,7 +149,7 @@ export default async function Home({ searchParams }: PageProps<"/">) {
         <section className="border-t border-line bg-ink">
           <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-14 sm:px-6 md:flex-row md:items-center md:justify-between">
             <div>
-              <h2 className="font-book text-2xl font-bold">Для учителя</h2>
+              <h2 className="font-display text-2xl font-bold">Для учителя</h2>
               <p className="mt-2 max-w-[52ch] text-lg text-muted">
                 Создайте класс за минуту и смотрите, какие типы ошибок ученики не замечают.
               </p>

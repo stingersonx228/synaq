@@ -42,7 +42,7 @@ export function TopBar({
   student: StudentIdentity | null;
 }) {
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-ink/85 backdrop-blur">
+    <header className="sticky top-0 z-30 border-b border-line bg-ink">
       <div className="mx-auto flex h-16 w-full max-w-7xl items-center gap-4 px-4">
         <Wordmark />
         <RoundTrack game={game} />
@@ -216,7 +216,7 @@ function ChatBubble({ msg }: { msg: ChatMsg }) {
   if (msg.from === "student") {
     return (
       <li className="rise flex justify-end">
-        <p className="max-w-[88%] rounded-xl rounded-br-sm bg-pen/12 px-4 py-2.5 leading-snug ring-1 ring-pen/30">
+        <p className="max-w-[88%] rounded-xl rounded-br-sm bg-pen/[0.07] px-4 py-2.5 leading-snug ring-1 ring-pen/25">
           {keepNumbersTogether(msg.text)}
         </p>
       </li>
@@ -225,8 +225,8 @@ function ChatBubble({ msg }: { msg: ChatMsg }) {
   return (
     <li className="rise flex">
       <p
-        className={`max-w-[88%] rounded-xl rounded-bl-sm px-4 py-2.5 leading-snug ${
-          msg.tone === "concede" ? "bg-good/15 ring-1 ring-good/50" : "bg-surface-2"
+        className={`max-w-[88%] rounded-xl rounded-bl-sm px-4 py-2 font-hand text-[1.35rem] leading-snug text-intern ${
+          msg.tone === "concede" ? "bg-good/10 ring-1 ring-good/45" : "bg-surface-2"
         }`}
       >
         {keepNumbersTogether(msg.text)}
@@ -256,8 +256,8 @@ export function LatestReply({ chat, typing }: { chat: ChatMsg[]; typing: boolean
       <InternAvatar size="sm" />
       <p
         key={typing ? "typing" : last?.key}
-        className={`rise rounded-xl rounded-tl-sm px-4 py-2.5 leading-snug ${
-          last?.tone === "concede" && !typing ? "bg-good/15 ring-1 ring-good/50" : "bg-surface-2"
+        className={`rise rounded-xl rounded-tl-sm px-4 py-2 font-hand text-[1.35rem] leading-snug text-intern ${
+          last?.tone === "concede" && !typing ? "bg-good/10 ring-1 ring-good/45" : "bg-surface-2"
         }`}
       >
         {typing ? "Алибек печатает…" : keepNumbersTogether(last?.text ?? "")}

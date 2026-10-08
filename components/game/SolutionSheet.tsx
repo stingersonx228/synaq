@@ -1,11 +1,12 @@
-import { CheckIcon, PenNibIcon } from "@phosphor-icons/react/dist/ssr";
 import { keepNumbersTogether } from "@/lib/format";
+import { GradeCircle, MarginCross, Tick } from "@/components/PenMarks";
 
 export type LineState = "idle" | "marked" | "cleared" | "bug";
 
 /**
- * Alibek's solution as numbered lines on a sheet. Pure presentation: the game passes
- * per-line states and a click handler; the landing page renders it statically.
+ * Alibek's solution in blue ballpoint on a squared notebook page. Line numbers sit in the
+ * margin, and so do the student's red-pen marks: a cross on the wrong line, a tick on a line
+ * that turned out right. Rows are two grid cells tall so the handwriting sits on the squares.
  */
 export default function SolutionSheet({
   steps,
@@ -14,7 +15,7 @@ export default function SolutionSheet({
   onPick,
   interactive = false,
   answerTone = "idle",
-  compact = false,
+  grade = null,
 }: {
   steps: string[];
   answer: string;
@@ -22,94 +23,80 @@ export default function SolutionSheet({
   onPick?: (n: number) => void;
   interactive?: boolean;
   answerTone?: "idle" | "good" | "bad";
-  compact?: boolean;
+  /** The red grade the student gives the solution once the round is over. */
+  grade?: { mark: string; note: string } | null;
 }) {
+  const row =
+    "group relative block w-full min-h-[calc(var(--grid)*2)] pl-[calc(var(--margin)+0.875rem)] pr-4 text-left sm:pr-6";
   return (
-    <div>
-      <ol className="flex flex-col">
+    <div className="notebook-sheet py-[var(--grid)]">
+      <ol className="font-hand text-[1.55rem] leading-[calc(var(--grid)*2)] text-intern sm:text-[1.7rem]">
         {steps.map((text, i) => {
           const n = i + 1;
           const state = lineState(n);
           const clickable = interactive && state === "idle";
-          const rowClass = `group relative grid w-full grid-cols-[2.25rem_1fr_auto] items-start gap-3 rounded-xl px-2 ${
-            compact ? "py-2" : "py-3"
-          } text-left transition duration-150 sm:px-3 ${
-            clickable ? "cursor-pointer hover:bg-surface-2 active:scale-[0.995]" : ""
-          } ${state === "cleared" ? "shake" : ""}`;
+          const wrong = state === "marked" || state === "bug";
           const content = (
             <>
-              <span
-                className={`pt-0.5 text-right font-mono text-base tabular-nums ${
-                  state === "marked" || state === "bug" ? "text-pen" : "text-muted"
-                }`}
-              >
+              <span className="absolute left-2 top-0 font-mono text-sm leading-[calc(var(--grid)*2)] text-faint sm:left-3">
                 {n}
               </span>
-              <span
-                className={`${compact ? "text-base sm:text-lg" : "text-lg sm:text-xl"} leading-relaxed ${
-                  state === "marked" || state === "bug" ? "pen-mark" : ""
-                } ${state === "cleared" ? "text-muted" : ""}`}
-              >
+              {wrong ? (
+                <MarginCross className="absolute left-[calc(var(--margin)-1.85rem)] top-2.5 h-6 w-6 text-pen" delay={0} />
+              ) : state === "cleared" ? (
+                <Tick className="absolute left-[calc(var(--margin)-1.85rem)] top-2.5 h-6 w-6 text-pen" delay={0} />
+              ) : null}
+              <span className={`${wrong ? "pen-mark" : ""} ${state === "cleared" ? "opacity-60" : ""}`}>
                 {keepNumbersTogether(text)}
               </span>
-              <LineTag state={state} clickable={clickable} />
+              {wrong ? <span className="sr-only"> (отмечена как ошибка)</span> : null}
+              {state === "cleared" ? <span className="sr-only"> (строка верна)</span> : null}
+              {clickable ? (
+                <span
+                  className="pointer-events-none ml-3 hidden text-[1.3rem] text-pen opacity-0 transition group-hover:opacity-100 sm:inline"
+                  aria-hidden
+                >
+                  ← здесь ошибка?
+                </span>
+              ) : null}
             </>
           );
           // Only selectable lines are buttons; everything else is plain text for screen readers.
           return (
-            <li key={n}>
+            <li key={n} className={state === "cleared" ? "shake" : undefined}>
               {clickable ? (
                 <button
                   type="button"
                   onClick={() => onPick?.(n)}
-                  aria-label={`Строка ${n}: ${text}. Отметить как ошибку`}
-                  className={rowClass}
+                  aria-label={`Строка ${n}: ${text} Отметить как ошибку`}
+                  className={`${row} cursor-pointer transition-colors duration-150 hover:bg-pen/[0.06] active:bg-pen/10`}
                 >
                   {content}
                 </button>
               ) : (
-                <div className={rowClass}>{content}</div>
+                <div className={row}>{content}</div>
               )}
             </li>
           );
         })}
+        <li className={`${row} mt-[var(--grid)]`}>
+          <span className="font-sans text-base text-muted">Ответ Алибека: </span>
+          <span className={answerTone === "bad" ? "pen-mark" : undefined}>{keepNumbersTogether(answer)}</span>
+          {answerTone === "good" ? <Tick className="ml-2 inline-block h-6 w-6 align-[-0.15em] text-pen" delay={0} /> : null}
+        </li>
       </ol>
-      <div
-        className={`mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 rounded-xl border border-dashed px-4 py-3 ${
-          answerTone === "good" ? "border-good/60" : answerTone === "bad" ? "border-pen/60" : "border-line"
-        }`}
-      >
-        <span className="text-muted">Ответ Алибека</span>
-        <span className="text-xl font-semibold">{keepNumbersTogether(answer)}</span>
-      </div>
+
+      {grade ? (
+        <div className="mt-2 flex items-center justify-end gap-3 pr-6 font-hand text-pen sm:pr-10">
+          <span className="-rotate-3 text-[1.6rem]">{grade.note}</span>
+          <span className="relative inline-flex h-16 w-20 items-center justify-center" role="img" aria-label={`Оценка: ${grade.mark}`}>
+            <GradeCircle className="absolute inset-0 h-full w-full" delay={350} />
+            <span className="text-5xl leading-none" aria-hidden>
+              {grade.mark}
+            </span>
+          </span>
+        </div>
+      ) : null}
     </div>
   );
-}
-
-function LineTag({ state, clickable }: { state: LineState; clickable: boolean }) {
-  if (state === "marked" || state === "bug") {
-    return (
-      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-pen/15 px-2.5 py-0.5 text-sm font-medium text-pen">
-        <PenNibIcon size={14} weight="fill" aria-hidden />
-        ошибка
-      </span>
-    );
-  }
-  if (state === "cleared") {
-    return (
-      <span className="mt-1 inline-flex items-center gap-1 rounded-full bg-surface-2 px-2.5 py-0.5 text-sm text-muted">
-        <CheckIcon size={14} aria-hidden />
-        верно
-      </span>
-    );
-  }
-  if (clickable) {
-    return (
-      <span className="pointer-events-none absolute right-3 top-3 hidden items-center gap-1 rounded-full bg-ink/90 px-2.5 py-0.5 text-sm text-pen opacity-0 transition group-hover:opacity-100 sm:inline-flex">
-        <PenNibIcon size={16} aria-hidden />
-        отметить
-      </span>
-    );
-  }
-  return <span />;
 }

@@ -110,9 +110,11 @@ describe("session picking", () => {
     }
   });
   it("replacement may switch between clean and buggy cases, so a swap never reveals the kind", () => {
+    // Walk every slot of the pool with a fixed rng instead of hoping random draws hit both kinds.
     const kinds = new Set<boolean>();
-    for (let i = 0; i < 60; i++) {
-      const id = pickReplacement("lin-ok", ["lin-ok"]);
+    const pool = CASES.length - 1;
+    for (let i = 0; i < pool; i++) {
+      const id = pickReplacement("lin-ok", ["lin-ok"], () => (i + 0.5) / pool);
       kinds.add(getCase(id!)!.bug === null);
     }
     expect(kinds).toEqual(new Set([true, false]));

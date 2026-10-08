@@ -33,7 +33,6 @@ import {
   TopBar,
 } from "./parts";
 import SolutionSheet, { type LineState } from "./SolutionSheet";
-import Confetti from "./Confetti";
 import Summary from "./Summary";
 
 const TYPING_MS = 500;
@@ -306,7 +305,6 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
           className={`pointer-events-none fixed inset-0 z-40 ${game.flash.kind === "good" ? "flash-good" : "flash-bad"}`}
         />
       ) : null}
-      {game.flash?.kind === "good" && won && c.bug ? <Confetti key={`confetti-${game.flash.key}`} /> : null}
       <TopBar game={game} offline={offline} student={student} />
 
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:py-8 xl:grid-cols-[minmax(0,1fr)_26rem]">
@@ -344,12 +342,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
             </p>
           ) : null}
 
-          <section
-            className={`rounded-xl border bg-surface p-3 transition-colors duration-500 sm:p-4 ${
-              won ? "border-good/70 bg-good/5" : "border-line"
-            }`}
-            aria-label="Решение Алибека"
-          >
+          <section aria-label="Решение Алибека">
             <SolutionSheet
               steps={c.steps}
               answer={c.answer}
@@ -357,6 +350,8 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
               onPick={pickLine}
               interactive={round.phase === "pick" && !busy}
               answerTone={done ? (c.bug ? "bad" : "good") : "idle"}
+              // The student grades the intern: a 2 for a refuted solution, a 5 for an honest clean one.
+              grade={won ? (c.bug ? { mark: "2", note: "Алибек сдался" } : { mark: "5", note: "Всё верно" }) : null}
             />
           </section>
 
