@@ -9,7 +9,17 @@ import { checkRefutation, describeProof, explainRefutation, parseValues } from "
 import { blindSpots, MAX_HINTS, MAX_REFUTE_TRIES, roundScore, stars } from "@/lib/scoring";
 import { getStudent, recordSession, setStudent, type StudentIdentity } from "@/lib/session";
 import type { Case, Outcome } from "@/lib/types";
-import { addMsg, newGame, newRound, type ChatMsg, type GameState, type Round, type RoundResult } from "./model";
+import {
+  addMsg,
+  loadGame,
+  newGame,
+  newRound,
+  saveGame,
+  type ChatMsg,
+  type GameState,
+  type Round,
+  type RoundResult,
+} from "./model";
 import {
   EXPLAIN_MIN,
   ExplainForm,
@@ -31,12 +41,17 @@ const TYPING_MS = 500;
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | null; offline: boolean }) {
-  const tokenRef = useRef(1);
-  const [game, setGame] = useState<GameState>(() => newGame(fixedCaseId, 1));
+  // Single-case links are stage demos: they always start clean, so only sessions are resumed.
+  const persist = fixedCaseId === null;
+  const [game, setGame] = useState<GameState>(() => (persist ? loadGame(offline) : null) ?? newGame(fixedCaseId, 1));
+  const tokenRef = useRef(game.round.token);
   const [student, setStudentState] = useState<StudentIdentity | null>(() => (offline ? null : getStudent()));
   const judgeRef = useRef<{ token: number; verdict: Promise<boolean> } | null>(null);
-  const explanationRef = useRef("");
   const savedRef = useRef(new WeakSet<RoundResult>());
+
+  useEffect(() => {
+    if (persist) saveGame(offline, game);
+  }, [game, offline, persist]);
 
   const { round } = game;
   const c = getCase(round.caseId) as Case;
@@ -46,6 +61,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
   const nextToken = () => ++tokenRef.current;
 
   // Sends each finished round to the class dashboard once (results are compared by identity).
+  // After a reload the restored rounds are sent again; the server stores each attemptId once.
   const studentId = student?.studentId ?? null;
   useEffect(() => {
     if (offline || !studentId) return;
@@ -162,11 +178,10 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     const clean = text.trim().replace(/\s+/g, " ");
     if (round.phase !== "explain" || busy || clean.length < EXPLAIN_MIN) return;
     const token = round.token;
-    updateRound(token, (r) => ({ ...addMsg(r, "student", clean), phase: "prove" }));
+    updateRound(token, (r) => ({ ...addMsg(r, "student", clean), phase: "prove", explanation: clean }));
     const verdict = fetchJudgeVerdict(c.id, clean, net);
     judgeRef.current = { token, verdict };
     void verdict.then((v) => updateRound(token, (r) => ({ ...r, causeOk: v })));
-    explanationRef.current = clean;
     void internSays(token, fetchInternReply(c.id, 0, clean, net));
   }
 
@@ -188,7 +203,15 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     if (result.ok) {
       const proof = describeProof(bug.refute, values, result);
       updateRound(token, (r) => ({ ...r, proofFeedback: null, proof, typing: true }));
-      const pending = judgeRef.current?.token === token ? judgeRef.current.verdict : Promise.resolve(false);
+      const pending =
+        judgeRef.current?.token === token
+          ? judgeRef.current.verdict
+          : round.causeOk !== null
+            ? Promise.resolve(round.causeOk)
+            : // Resumed after a reload before the verdict arrived: ask again (the server caches it).
+              round.explanation
+              ? fetchJudgeVerdict(c.id, round.explanation, net)
+              : Promise.resolve(false);
       const [causeOk] = await Promise.all([pending, wait(TYPING_MS)]);
       updateRound(token, (r) => addMsg({ ...r, typing: false, causeOk }, "intern", bug.concede, "concede"));
       finishRound(token, "solved", { causeOk, refuteTries: tries }, false);
@@ -204,7 +227,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     updateRound(token, (r) => ({ ...r, proofFeedback: feedback }));
     const reply =
       tries === 1
-        ? fetchInternReply(c.id, 1, explanationRef.current, net)
+        ? fetchInternReply(c.id, 1, round.explanation ?? "", net)
         : INTERN_LINES.proofFailed[result.reason];
     await internSays(token, reply);
   }
@@ -278,12 +301,12 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     <div className="flex min-h-[100dvh] flex-col">
       {game.flash ? (
         <div
-          key={game.flash.key}
+          key={`flash-${game.flash.key}`}
           aria-hidden
           className={`pointer-events-none fixed inset-0 z-40 ${game.flash.kind === "good" ? "flash-good" : "flash-bad"}`}
         />
       ) : null}
-      {game.flash?.kind === "good" && won && c.bug ? <Confetti key={game.flash.key} /> : null}
+      {game.flash?.kind === "good" && won && c.bug ? <Confetti key={`confetti-${game.flash.key}`} /> : null}
       <TopBar game={game} offline={offline} student={student} />
 
       <main className="mx-auto grid w-full max-w-7xl flex-1 grid-cols-1 gap-6 px-4 py-6 lg:grid-cols-[minmax(0,1fr)_24rem] lg:py-8 xl:grid-cols-[minmax(0,1fr)_26rem]">
