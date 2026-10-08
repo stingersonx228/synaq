@@ -26,6 +26,15 @@
   --ease-out-soft: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
+/*
+  Landing only: Alibek's ballpoint handwriting and textbook headings. `inline` because the
+  font variables live on the landing wrapper, not on :root.
+*/
+@theme inline {
+  --font-hand: var(--font-caveat), "Segoe Print", cursive;
+  --font-book: var(--font-pt-serif), Georgia, serif;
+}
+
 :root {
   color-scheme: dark;
 }
@@ -67,6 +76,88 @@ body {
 :focus-visible {
   outline: 2px solid var(--color-pen);
   outline-offset: 2px;
+}
+
+/*
+  Landing page: a squared school notebook (cool white sheet, blue grid, red margin) checked
+  with a red pen. It redefines the game's token names inside this scope, so shared pieces
+  (buttons, the join form) switch to paper colors while the game and dashboard stay dark.
+*/
+.notebook {
+  --color-ink: oklch(0.99 0.003 245);
+  --color-surface: oklch(1 0 0);
+  --color-surface-2: oklch(0.955 0.008 245);
+  --color-line: oklch(0.8 0.025 248);
+  --color-text: oklch(0.24 0.03 262);
+  --color-muted: oklch(0.44 0.028 258);
+  --color-faint: oklch(0.62 0.025 255);
+  --color-pen: oklch(0.54 0.19 27);
+  --color-bad: oklch(0.54 0.19 27);
+  --color-good: oklch(0.5 0.12 155);
+  /* Blue ballpoint: the intern writes in it. */
+  --color-intern: oklch(0.44 0.15 262);
+  --radius-xl: 0.375rem;
+  --grid: 22px;
+  --grid-line: oklch(0.93 0.018 240);
+  color-scheme: light;
+  color: var(--color-text);
+  background-color: var(--color-ink);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid) var(--grid);
+}
+
+body:has(.notebook) {
+  background: oklch(0.99 0.003 245);
+}
+
+/* One notebook page lying on the desk: stronger grid and the red margin line. */
+.notebook-sheet {
+  --grid-line: oklch(0.87 0.03 242);
+  --margin: 3.25rem;
+  position: relative;
+  background-color: var(--color-surface);
+  background-image:
+    linear-gradient(var(--grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+  background-size: var(--grid) var(--grid);
+  box-shadow:
+    0 1px 2px oklch(0.3 0.03 260 / 0.08),
+    0 18px 40px -24px oklch(0.3 0.04 260 / 0.35);
+}
+
+.notebook-sheet::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 var(--margin);
+  width: 1px;
+  background: oklch(0.62 0.17 25 / 0.75);
+}
+
+@media (min-width: 640px) {
+  .notebook-sheet {
+    --margin: 4.5rem;
+  }
+}
+
+/*
+  Red-pen strokes draw themselves once, in order (SVG paths use pathLength="1"). The marks are
+  visible by default; `.pen-anim` is set before first paint only when the page is on screen,
+  so a background tab, a link preview or a screenshot never shows a sheet without marks.
+*/
+@keyframes pen-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.pen-anim .pen-draw {
+  stroke-dasharray: 1;
+  animation: pen-draw 650ms cubic-bezier(0.65, 0, 0.35, 1) var(--delay, 0ms) both;
 }
 
 /* The student's red-pen mark under a line of the intern's solution. */
@@ -192,6 +283,11 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .confetti {
     display: none;
+  }
+
+  .pen-anim .pen-draw {
+    animation: none;
+    stroke-dasharray: none;
   }
 
   .flash-good,

@@ -3,11 +3,18 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { HeartIcon, RobotIcon, StarIcon } from "@phosphor-icons/react/dist/ssr";
 
-export function Wordmark({ className = "" }: { className?: string }) {
+export function Wordmark({ className = "", tone = "light" }: { className?: string; tone?: "light" | "ink" }) {
   return (
     <Link href="/" className={`inline-flex shrink-0 ${className}`}>
-      {/* White artwork on the always-dark theme; print turns it black for the paper report. */}
-      <Image src="/logo.png" alt="Synaq" width={295} height={96} priority className="h-7 w-auto print:brightness-0 sm:h-8" />
+      {/* White artwork for dark pages, ink artwork for the notebook page; print turns either black. */}
+      <Image
+        src={tone === "ink" ? "/logo-ink.png" : "/logo.png"}
+        alt="Synaq"
+        width={295}
+        height={96}
+        priority
+        className="h-7 w-auto print:brightness-0 sm:h-8"
+      />
     </Link>
   );
 }
