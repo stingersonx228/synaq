@@ -147,8 +147,21 @@ describe("pickPracticeCases", () => {
     }
   });
 
-  it("replays the same case when it is the only one of its type", () => {
-    expect(pickPracticeCases(["log_sum"], ["log-01"])).toContain("log-01");
+  it("gives every buggy error type a second case, so practice offers a fresh one", () => {
+    const buggyTypes = new Set(CASES.filter((c) => c.bug !== null).map((c) => c.type_id));
+    for (const type of buggyTypes) {
+      expect(CASES.filter((c) => c.type_id === type).length, type).toBeGreaterThanOrEqual(2);
+    }
+    for (let i = 0; i < 20; i++) {
+      const ids = pickPracticeCases(["log_sum"], ["log-01"]);
+      expect(ids).toContain("log-02");
+      expect(ids).not.toContain("log-01");
+    }
+  });
+
+  it("replays a played case when every case of its type was played", () => {
+    const ids = pickPracticeCases(["log_sum"], ["log-01", "log-02"]);
+    expect(ids.some((id) => id === "log-01" || id === "log-02")).toBe(true);
   });
 });
 
