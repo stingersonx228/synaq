@@ -1,6 +1,6 @@
 import { evaluate } from "mathjs/number";
 import { checkRefutation } from "../refute";
-import type { Case } from "../types";
+import { SUBJECTS, type Case } from "../types";
 import { compactAnswer, TYPE_NAMES } from "./index";
 
 const nonEmpty = (s: unknown): boolean => typeof s === "string" && s.trim().length > 0;
@@ -29,6 +29,7 @@ export function validateCatalog(cases: Case[]): string[] {
       if (!nonEmpty(c[key])) at(`empty ${key}`);
     }
     if (!(c.type_id in TYPE_NAMES)) at(`type_id "${c.type_id}" has no display name`);
+    if (!SUBJECTS.includes(c.subject)) at(`unknown subject "${c.subject}"`);
     if (![8, 9, 10, 11].includes(c.level)) at("level must be 8..11");
     if (c.steps.length < 3) at("steps.length < 3");
     c.steps.forEach((s, i) => !nonEmpty(s) && at(`empty step ${i + 1}`));

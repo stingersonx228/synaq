@@ -1,8 +1,21 @@
-import type { Case } from "../types";
-import { CASES } from "./cases";
+import type { Case, Subject } from "../types";
+import { ALGEBRA_CASES } from "./cases";
+import { PHYSICS_CASES } from "./physics";
 import type { RefuteFailReason } from "../refute";
 
-export { CASES };
+export const CASES: Case[] = [...ALGEBRA_CASES, ...PHYSICS_CASES];
+
+export const DEFAULT_SUBJECT: Subject = "algebra";
+
+/** Display names; `dative` fits «игра по …». */
+export const SUBJECT_NAMES: Record<Subject, { name: string; dative: string }> = {
+  algebra: { name: "Алгебра", dative: "алгебре" },
+  physics: { name: "Физика", dative: "физике" },
+};
+
+export function casesOf(subject: Subject): Case[] {
+  return CASES.filter((c) => c.subject === subject);
+}
 
 export const SESSION_ROUNDS = 6;
 export const SESSION_LIVES = 3;
@@ -40,11 +53,26 @@ export const TYPE_NAMES: Record<string, string> = {
   sqrt_abs: "Корень из квадрата: модуль",
   exp_divide: "Показательные уравнения",
   sin_sum: "Тригонометрия: синус суммы",
+  kmh_units: "Перевод км/ч и м/с",
+  parallel_resistors: "Параллельное соединение резисторов",
+  half_at2: "Равноускоренное движение: потерянная ½",
+  density_formula: "Плотность: перевёрнутая формула",
+  vector_sum: "Сложение перпендикулярных векторов",
+  ohm_law: "Закон Ома: умножение и деление",
+  unit_powers: "Перевод см² и см³ в метры",
+  kinetic_square: "Кинетическая энергия: скорость без квадрата",
   clean: "Ложная тревога: ошибки не было",
 };
 
 export function typeName(typeId: string): string {
   return TYPE_NAMES[typeId] ?? typeId;
+}
+
+// Every error type belongs to one subject; "clean" (no error) exists in all of them.
+const TYPE_SUBJECT = new Map(CASES.filter((c) => c.bug !== null).map((c) => [c.type_id, c.subject]));
+
+export function typeSubject(typeId: string): Subject | null {
+  return TYPE_SUBJECT.get(typeId) ?? null;
 }
 
 /** Fixed intern lines that never come from the LLM. */
@@ -98,10 +126,15 @@ export function shuffle<T>(items: readonly T[], rng: Rng = Math.random): T[] {
   return out;
 }
 
-/** Picks a session: exactly one clean case, the rest unique buggy cases, in random order. */
-export function pickSessionCases(rounds: number = SESSION_ROUNDS, rng: Rng = Math.random): string[] {
-  const clean = shuffle(CASES.filter((c) => c.bug === null), rng);
-  const buggy = shuffle(CASES.filter((c) => c.bug !== null), rng);
+/** Picks a session of one subject: exactly one clean case, the rest unique buggy cases, shuffled. */
+export function pickSessionCases(
+  rounds: number = SESSION_ROUNDS,
+  rng: Rng = Math.random,
+  subject: Subject = DEFAULT_SUBJECT,
+): string[] {
+  const pool = casesOf(subject);
+  const clean = shuffle(pool.filter((c) => c.bug === null), rng);
+  const buggy = shuffle(pool.filter((c) => c.bug !== null), rng);
   if (clean.length === 0 || rounds < 1) return buggy.slice(0, rounds).map((c) => c.id);
   const picked = [clean[0], ...buggy.slice(0, rounds - 1)];
   return shuffle(picked, rng).map((c) => c.id);
@@ -113,15 +146,21 @@ export const PRACTICE_MIN_ROUNDS = 4;
  * Practice session for a student's blind spots: one case per weak error type (preferring a
  * case not just played), topped up with unplayed cases to PRACTICE_MIN_ROUNDS, shuffled.
  */
-export function pickPracticeCases(spotTypes: string[], played: string[], rng: Rng = Math.random): string[] {
+export function pickPracticeCases(
+  spotTypes: string[],
+  played: string[],
+  rng: Rng = Math.random,
+  subject: Subject = DEFAULT_SUBJECT,
+): string[] {
+  const pool = casesOf(subject);
   const picked: string[] = [];
   for (const type of spotTypes.slice(0, SESSION_ROUNDS)) {
-    const ofType = shuffle(CASES.filter((c) => c.type_id === type), rng);
+    const ofType = shuffle(pool.filter((c) => c.type_id === type), rng);
     const choice = ofType.find((c) => !played.includes(c.id)) ?? ofType[0];
     if (choice && !picked.includes(choice.id)) picked.push(choice.id);
   }
   const fresh = shuffle(
-    CASES.filter((c) => c.bug !== null && !played.includes(c.id) && !picked.includes(c.id)),
+    pool.filter((c) => c.bug !== null && !played.includes(c.id) && !picked.includes(c.id)),
     rng,
   );
   while (picked.length < PRACTICE_MIN_ROUNDS && fresh.length > 0) picked.push(fresh.shift()!.id);
@@ -129,11 +168,12 @@ export function pickPracticeCases(spotTypes: string[], played: string[], rng: Rn
 }
 
 /**
- * Picks any case not in `exclude`. Deliberately ignores clean/buggy kind: swapping a clean
- * case only among clean cases would tell the player there is no bug.
+ * Picks any case of the same subject not in `exclude`. Deliberately ignores clean/buggy kind:
+ * swapping a clean case only among clean cases would tell the player there is no bug.
  */
 export function pickReplacement(current: string, exclude: string[], rng: Rng = Math.random): string | null {
-  const pool = CASES.filter((c) => c.id !== current && !exclude.includes(c.id));
+  const subject = getCase(current)?.subject ?? DEFAULT_SUBJECT;
+  const pool = casesOf(subject).filter((c) => c.id !== current && !exclude.includes(c.id));
   if (pool.length === 0) return null;
   return pool[Math.floor(rng() * pool.length)].id;
 }

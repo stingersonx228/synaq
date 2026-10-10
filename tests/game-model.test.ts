@@ -69,3 +69,23 @@ describe("restoreGame", () => {
     expect(restoreGame(raw)).toBeNull();
   });
 });
+
+describe("subjects in saved sessions", () => {
+  it("starts and restores a physics session", () => {
+    const g = newGame(null, 1, undefined, "physics");
+    expect(g.subject).toBe("physics");
+    expect(roundTrip(g)!.subject).toBe("physics");
+  });
+
+  it("reads a session saved before subjects existed as algebra", () => {
+    const legacy: Partial<GameState> = newGame(null, 1);
+    delete legacy.subject;
+    expect(roundTrip(legacy)!.subject).toBe("algebra");
+  });
+
+  it("rejects a session whose cases belong to another subject", () => {
+    const g = newGame(null, 1, undefined, "physics");
+    expect(roundTrip({ ...g, subject: "algebra" })).toBeNull();
+    expect(roundTrip({ ...g, subject: "chemistry" })).toBeNull();
+  });
+});

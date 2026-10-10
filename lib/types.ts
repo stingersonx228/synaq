@@ -25,8 +25,12 @@ export interface Bug {
 
 export type Level = 8 | 9 | 10 | 11;
 
+export const SUBJECTS = ["algebra", "physics"] as const;
+export type Subject = (typeof SUBJECTS)[number];
+
 export interface Case {
   id: string;
+  subject: Subject;
   type_id: string;
   topic: string;
   level: Level;

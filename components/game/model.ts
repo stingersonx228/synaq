@@ -1,5 +1,5 @@
-import { getCase, INTERN_LINES, pickSessionCases, SESSION_LIVES } from "@/lib/catalog";
-import { OUTCOMES, type Outcome } from "@/lib/types";
+import { DEFAULT_SUBJECT, getCase, INTERN_LINES, pickSessionCases, SESSION_LIVES, SESSION_ROUNDS } from "@/lib/catalog";
+import { OUTCOMES, SUBJECTS, type Outcome, type Subject } from "@/lib/types";
 
 export type Phase = "pick" | "explain" | "prove" | "done";
 
@@ -46,6 +46,7 @@ export interface RoundResult {
 }
 
 export interface GameState {
+  subject: Subject;
   caseIds: string[];
   index: number;
   lives: number;
@@ -77,10 +78,20 @@ export function newRound(caseId: string, token: number): Round {
   };
 }
 
-/** `caseIds` overrides the random pick (used by blind-spot practice). */
-export function newGame(fixedCaseId: string | null, token: number, presetCaseIds?: string[]): GameState {
-  const caseIds = presetCaseIds?.length ? presetCaseIds : fixedCaseId ? [fixedCaseId] : pickSessionCases();
+/** `presetCaseIds` overrides the random pick (used by blind-spot practice). */
+export function newGame(
+  fixedCaseId: string | null,
+  token: number,
+  presetCaseIds?: string[],
+  subject: Subject = DEFAULT_SUBJECT,
+): GameState {
+  const caseIds = presetCaseIds?.length
+    ? presetCaseIds
+    : fixedCaseId
+      ? [fixedCaseId]
+      : pickSessionCases(SESSION_ROUNDS, Math.random, subject);
   return {
+    subject: getCase(caseIds[0])?.subject ?? subject,
     caseIds,
     index: 0,
     lives: SESSION_LIVES,
@@ -164,12 +175,16 @@ function isRound(v: unknown): v is Round {
 export function restoreGame(raw: unknown): GameState | null {
   if (!isObj(raw) || raw.over !== false) return null;
   const { caseIds, index, lives, total, results, round } = raw;
+  // Sessions saved before subjects existed are algebra.
+  const subject = raw.subject === undefined ? DEFAULT_SUBJECT : raw.subject;
+  if (!SUBJECTS.includes(subject as Subject)) return null;
   if (!Array.isArray(caseIds) || caseIds.length === 0) return null;
-  if (!caseIds.every((id) => isStr(id) && getCase(id) !== undefined)) return null;
+  if (!caseIds.every((id) => isStr(id) && getCase(id)?.subject === subject)) return null;
   if (!isInt(index, 0, caseIds.length - 1) || !isInt(lives, 0, SESSION_LIVES) || !isNum(total)) return null;
   if (!Array.isArray(results) || !results.every(isResult)) return null;
   if (!isRound(round) || round.caseId !== caseIds[index]) return null;
   return {
+    subject: subject as Subject,
     caseIds: caseIds as string[],
     index,
     lives,
@@ -181,12 +196,13 @@ export function restoreGame(raw: unknown): GameState | null {
   };
 }
 
-// Per browser tab: a reload resumes the session, a new tab starts a fresh one.
-const saveKey = (offline: boolean) => `synaq.game.v1.${offline ? "offline" : "online"}`;
+// Per browser tab and subject: a reload resumes the session, a new tab starts a fresh one.
+const saveKey = (offline: boolean, subject: Subject) =>
+  `synaq.game.v1.${offline ? "offline" : "online"}${subject === DEFAULT_SUBJECT ? "" : `.${subject}`}`;
 
-export function loadGame(offline: boolean): GameState | null {
+export function loadGame(offline: boolean, subject: Subject): GameState | null {
   try {
-    const raw = window.sessionStorage.getItem(saveKey(offline));
+    const raw = window.sessionStorage.getItem(saveKey(offline, subject));
     return raw ? restoreGame(JSON.parse(raw)) : null;
   } catch {
     return null;
@@ -194,10 +210,10 @@ export function loadGame(offline: boolean): GameState | null {
 }
 
 /** Saves an unfinished session; a finished one (or null) clears the slot. */
-export function saveGame(offline: boolean, game: GameState | null): void {
+export function saveGame(offline: boolean, subject: Subject, game: GameState | null): void {
   try {
-    if (!game || game.over) window.sessionStorage.removeItem(saveKey(offline));
-    else window.sessionStorage.setItem(saveKey(offline), JSON.stringify(game));
+    if (!game || game.over) window.sessionStorage.removeItem(saveKey(offline, subject));
+    else window.sessionStorage.setItem(saveKey(offline, subject), JSON.stringify(game));
   } catch {
     // Storage is optional: without it a reload simply starts a new session.
   }

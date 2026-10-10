@@ -2,7 +2,8 @@
 
 import Link from "next/link";
 import { ArrowCounterClockwiseIcon, CaretDownIcon, CheckIcon, TargetIcon, XIcon } from "@phosphor-icons/react/dist/ssr";
-import { getCase, SESSION_LIVES, typeName } from "@/lib/catalog";
+import { getCase, SESSION_LIVES, SUBJECT_NAMES, typeName } from "@/lib/catalog";
+import { SUBJECTS } from "@/lib/types";
 import { keepNumbersTogether } from "@/lib/format";
 import { plural } from "@/lib/plural";
 import { blindSpots, stars } from "@/lib/scoring";
@@ -29,7 +30,8 @@ export default function Summary({
   const solved = game.results.filter((r) => r.outcome === "solved").length;
   const avg = played > 0 ? Math.round(game.total / played) : 0;
   const spots = blindSpots(game.results);
-  const fullGameHref = offline ? "/play?offline=1" : "/play";
+  const playHref = (subject: string) => `/play?subject=${subject}${offline ? "&offline=1" : ""}`;
+  const otherSubjects = SUBJECTS.filter((s) => s !== game.subject);
 
   return (
     <div className="flex min-h-[100dvh] flex-col">
@@ -153,10 +155,16 @@ export default function Summary({
             Играть ещё
           </Button>
           {fixedCaseId ? (
-            <Link href={fullGameHref} className={buttonClass("secondary")}>
+            <Link href={playHref(game.subject)} className={buttonClass("secondary")}>
               Полная игра, 6 раундов
             </Link>
           ) : null}
+          {otherSubjects.map((s) => (
+            // A plain link, not router state: the game keys its session on the subject in the URL.
+            <Link key={s} href={playHref(s)} className={buttonClass("secondary")}>
+              Попробовать: {SUBJECT_NAMES[s].name.toLowerCase()}
+            </Link>
+          ))}
           <Link href="/" className={buttonClass("ghost")}>
             На главную
           </Link>

@@ -3,6 +3,7 @@ import { evaluate } from "mathjs/number";
 import { checkRefutation } from "../lib/refute";
 import {
   CASES,
+  casesOf,
   getCase,
   keywordJudge,
   pickPracticeCases,
@@ -11,9 +12,10 @@ import {
   pickSessionCases,
   SESSION_ROUNDS,
   typeName,
+  typeSubject,
 } from "../lib/catalog";
 import { validateCatalog } from "../lib/catalog/validate";
-import type { Case } from "../lib/types";
+import { SUBJECTS, type Case } from "../lib/types";
 
 const clone = (c: Case): Case => structuredClone(c);
 
@@ -172,5 +174,52 @@ describe("validateCatalog: keywords", () => {
     const c = structuredClone(getCase("sq-01")!);
     c.bug!.keywords = [...c.bug!.keywords, "6x"];
     expect(validateCatalog([c, getCase("lin-ok")!]).join("\n")).toContain("keyword is part of the correct answer: 6x");
+  });
+});
+
+describe("subjects", () => {
+  it("every subject has clean cases and enough buggy ones for a session", () => {
+    for (const subject of SUBJECTS) {
+      const pool = casesOf(subject);
+      expect(pool.filter((c) => c.bug === null).length, subject).toBeGreaterThanOrEqual(1);
+      expect(pool.filter((c) => c.bug !== null).length, subject).toBeGreaterThanOrEqual(SESSION_ROUNDS - 1);
+    }
+  });
+
+  it("an error type belongs to exactly one subject", () => {
+    const owners = new Map<string, Set<string>>();
+    for (const c of CASES.filter((x) => x.bug !== null)) {
+      owners.set(c.type_id, (owners.get(c.type_id) ?? new Set()).add(c.subject));
+    }
+    for (const [type, subjects] of owners) expect(subjects.size, type).toBe(1);
+    expect(typeSubject("ohm_law")).toBe("physics");
+    expect(typeSubject("odz")).toBe("algebra");
+    expect(typeSubject("clean")).toBeNull();
+  });
+
+  it("a physics session holds only physics, with exactly one clean case", () => {
+    for (let i = 0; i < 30; i++) {
+      const ids = pickSessionCases(SESSION_ROUNDS, Math.random, "physics");
+      expect(ids).toHaveLength(SESSION_ROUNDS);
+      expect(ids.every((id) => getCase(id)!.subject === "physics")).toBe(true);
+      expect(ids.filter((id) => getCase(id)!.bug === null)).toHaveLength(1);
+    }
+  });
+
+  it("the spare intern never switches the subject", () => {
+    const pool = casesOf("physics").length - 1;
+    for (let i = 0; i < pool; i++) {
+      const id = pickReplacement("ph-ohm-01", ["ph-ohm-01"], () => (i + 0.5) / pool);
+      expect(getCase(id!)!.subject).toBe("physics");
+    }
+  });
+
+  it("practice stays in the subject, also for the shared clean type", () => {
+    for (let i = 0; i < 20; i++) {
+      const ids = pickPracticeCases(["clean", "ohm_law"], ["ph-ok-01", "ph-ohm-01"], Math.random, "physics");
+      expect(ids.every((id) => getCase(id)!.subject === "physics")).toBe(true);
+      expect(ids).toContain("ph-ok-02");
+      expect(ids).toContain("ph-ohm-02");
+    }
   });
 });

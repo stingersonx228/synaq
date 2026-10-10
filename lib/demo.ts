@@ -36,6 +36,14 @@ const DIFFICULTY: Record<string, number> = {
   sqrt_abs: 0.49,
   exp_divide: 0.43,
   sin_sum: 0.4,
+  kmh_units: 0.45,
+  parallel_resistors: 0.6,
+  half_at2: 0.48,
+  density_formula: 0.3,
+  vector_sum: 0.5,
+  ohm_law: 0.25,
+  unit_powers: 0.66,
+  kinetic_square: 0.42,
 };
 
 const NICK_ROOTS = ["Барыс", "Қыран", "Тұлпар", "Арлан", "Самұрық", "Бүркіт", "Жұлдыз", "Сұңқар", "Шағала", "Көкжал"];
@@ -68,7 +76,7 @@ function demoRows(): { students: StudentRow[]; attempts: AttemptRow[] } {
 
     // Skill shifts every difficulty by up to ±0.2 so students differ visibly.
     const skill = (rng() - 0.5) * 0.4;
-    const rounds = 8 + Math.floor(rng() * 17);
+    const rounds = 12 + Math.floor(rng() * 19);
     // Uneven timestamps: real classes do not play on the hour or every 7 minutes exactly.
     const lastSeen = NOW - Math.floor(rng() * 9 * 24 * 60) * 60 * 1000;
     let at = lastSeen;

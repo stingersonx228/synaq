@@ -1,8 +1,9 @@
 import type { Case } from "../types";
 
-export const CASES: Case[] = [
+export const ALGEBRA_CASES: Case[] = [
   {
     id: "pct-01",
+    subject: "algebra",
     type_id: "percent_add",
     topic: "Проценты",
     level: 8,
@@ -45,6 +46,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-02",
+    subject: "algebra",
     type_id: "percent_base",
     topic: "Проценты",
     level: 8,
@@ -87,6 +89,7 @@ export const CASES: Case[] = [
   },
   {
     id: "frac-01",
+    subject: "algebra",
     type_id: "fraction_add",
     topic: "Дроби",
     level: 8,
@@ -135,6 +138,7 @@ export const CASES: Case[] = [
   },
   {
     id: "odz-01",
+    subject: "algebra",
     type_id: "odz",
     topic: "Рациональные уравнения",
     level: 9,
@@ -177,6 +181,7 @@ export const CASES: Case[] = [
   },
   {
     id: "rad-01",
+    subject: "algebra",
     type_id: "extraneous_root",
     topic: "Иррациональные уравнения",
     level: 10,
@@ -219,6 +224,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sign-01",
+    subject: "algebra",
     type_id: "sign_transfer",
     topic: "Линейные уравнения",
     level: 8,
@@ -261,6 +267,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sq-01",
+    subject: "algebra",
     type_id: "square_sum",
     topic: "Формулы сокращённого умножения",
     level: 9,
@@ -303,6 +310,7 @@ export const CASES: Case[] = [
   },
   {
     id: "ineq-01",
+    subject: "algebra",
     type_id: "ineq_sign",
     topic: "Неравенства",
     level: 9,
@@ -345,6 +353,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-03",
+    subject: "algebra",
     type_id: "percent_symmetric",
     topic: "Проценты",
     level: 8,
@@ -387,6 +396,7 @@ export const CASES: Case[] = [
   },
   {
     id: "root-01",
+    subject: "algebra",
     type_id: "lost_root",
     topic: "Квадратные уравнения",
     level: 8,
@@ -429,6 +439,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pow-01",
+    subject: "algebra",
     type_id: "power_mult",
     topic: "Степени",
     level: 8,
@@ -476,6 +487,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sqrt-01",
+    subject: "algebra",
     type_id: "sqrt_sum",
     topic: "Квадратные корни",
     level: 8,
@@ -523,6 +535,7 @@ export const CASES: Case[] = [
   },
   {
     id: "abs-01",
+    subject: "algebra",
     type_id: "abs_lost",
     topic: "Модуль",
     level: 8,
@@ -565,6 +578,7 @@ export const CASES: Case[] = [
   },
   {
     id: "disc-01",
+    subject: "algebra",
     type_id: "root_formula",
     topic: "Квадратные уравнения",
     level: 8,
@@ -606,6 +620,7 @@ export const CASES: Case[] = [
   },
   {
     id: "log-01",
+    subject: "algebra",
     type_id: "log_sum",
     topic: "Логарифмы",
     level: 10,
@@ -652,6 +667,7 @@ export const CASES: Case[] = [
   },
   {
     id: "frac-02",
+    subject: "algebra",
     type_id: "cancel_terms",
     topic: "Алгебраические дроби",
     level: 8,
@@ -693,6 +709,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-04",
+    subject: "algebra",
     type_id: "percent_add",
     topic: "Проценты",
     level: 8,
@@ -734,6 +751,7 @@ export const CASES: Case[] = [
   },
   {
     id: "ap-01",
+    subject: "algebra",
     type_id: "ap_formula",
     topic: "Арифметическая прогрессия",
     level: 9,
@@ -778,6 +796,7 @@ export const CASES: Case[] = [
   },
   {
     id: "negexp-01",
+    subject: "algebra",
     type_id: "neg_exponent",
     topic: "Степени",
     level: 9,
@@ -822,6 +841,7 @@ export const CASES: Case[] = [
   },
   {
     id: "speed-01",
+    subject: "algebra",
     type_id: "avg_speed",
     topic: "Текстовые задачи",
     level: 9,
@@ -869,6 +889,7 @@ export const CASES: Case[] = [
   },
   {
     id: "work-01",
+    subject: "algebra",
     type_id: "joint_work",
     topic: "Текстовые задачи",
     level: 9,
@@ -913,6 +934,7 @@ export const CASES: Case[] = [
   },
   {
     id: "vieta-01",
+    subject: "algebra",
     type_id: "vieta_sign",
     topic: "Квадратные уравнения",
     level: 8,
@@ -955,6 +977,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sqabs-01",
+    subject: "algebra",
     type_id: "sqrt_abs",
     topic: "Квадратные корни",
     level: 9,
@@ -995,6 +1018,7 @@ export const CASES: Case[] = [
   },
   {
     id: "exp-01",
+    subject: "algebra",
     type_id: "exp_divide",
     topic: "Показательные уравнения",
     level: 10,
@@ -1036,6 +1060,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sin-01",
+    subject: "algebra",
     type_id: "sin_sum",
     topic: "Тригонометрия",
     level: 10,
@@ -1083,6 +1108,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-05",
+    subject: "algebra",
     type_id: "percent_base",
     topic: "Проценты",
     level: 8,
@@ -1124,6 +1150,7 @@ export const CASES: Case[] = [
   },
   {
     id: "frac-03",
+    subject: "algebra",
     type_id: "fraction_add",
     topic: "Дроби",
     level: 8,
@@ -1171,6 +1198,7 @@ export const CASES: Case[] = [
   },
   {
     id: "odz-02",
+    subject: "algebra",
     type_id: "odz",
     topic: "Рациональные уравнения",
     level: 9,
@@ -1212,6 +1240,7 @@ export const CASES: Case[] = [
   },
   {
     id: "rad-02",
+    subject: "algebra",
     type_id: "extraneous_root",
     topic: "Иррациональные уравнения",
     level: 10,
@@ -1254,6 +1283,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sign-02",
+    subject: "algebra",
     type_id: "sign_transfer",
     topic: "Линейные уравнения",
     level: 8,
@@ -1295,6 +1325,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sq-02",
+    subject: "algebra",
     type_id: "square_sum",
     topic: "Формулы сокращённого умножения",
     level: 9,
@@ -1336,6 +1367,7 @@ export const CASES: Case[] = [
   },
   {
     id: "ineq-02",
+    subject: "algebra",
     type_id: "ineq_sign",
     topic: "Неравенства",
     level: 9,
@@ -1378,6 +1410,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-06",
+    subject: "algebra",
     type_id: "percent_symmetric",
     topic: "Проценты",
     level: 8,
@@ -1420,6 +1453,7 @@ export const CASES: Case[] = [
   },
   {
     id: "root-02",
+    subject: "algebra",
     type_id: "lost_root",
     topic: "Квадратные уравнения",
     level: 8,
@@ -1461,6 +1495,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pow-02",
+    subject: "algebra",
     type_id: "power_mult",
     topic: "Степени",
     level: 8,
@@ -1508,6 +1543,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sqrt-02",
+    subject: "algebra",
     type_id: "sqrt_sum",
     topic: "Квадратные корни",
     level: 8,
@@ -1555,6 +1591,7 @@ export const CASES: Case[] = [
   },
   {
     id: "abs-02",
+    subject: "algebra",
     type_id: "abs_lost",
     topic: "Модуль",
     level: 8,
@@ -1596,6 +1633,7 @@ export const CASES: Case[] = [
   },
   {
     id: "disc-02",
+    subject: "algebra",
     type_id: "root_formula",
     topic: "Квадратные уравнения",
     level: 8,
@@ -1637,6 +1675,7 @@ export const CASES: Case[] = [
   },
   {
     id: "log-02",
+    subject: "algebra",
     type_id: "log_sum",
     topic: "Логарифмы",
     level: 10,
@@ -1683,6 +1722,7 @@ export const CASES: Case[] = [
   },
   {
     id: "frac-04",
+    subject: "algebra",
     type_id: "cancel_terms",
     topic: "Алгебраические дроби",
     level: 8,
@@ -1724,6 +1764,7 @@ export const CASES: Case[] = [
   },
   {
     id: "ap-02",
+    subject: "algebra",
     type_id: "ap_formula",
     topic: "Арифметическая прогрессия",
     level: 9,
@@ -1768,6 +1809,7 @@ export const CASES: Case[] = [
   },
   {
     id: "negexp-02",
+    subject: "algebra",
     type_id: "neg_exponent",
     topic: "Степени",
     level: 9,
@@ -1811,6 +1853,7 @@ export const CASES: Case[] = [
   },
   {
     id: "speed-02",
+    subject: "algebra",
     type_id: "avg_speed",
     topic: "Текстовые задачи",
     level: 9,
@@ -1858,6 +1901,7 @@ export const CASES: Case[] = [
   },
   {
     id: "work-02",
+    subject: "algebra",
     type_id: "joint_work",
     topic: "Текстовые задачи",
     level: 9,
@@ -1902,6 +1946,7 @@ export const CASES: Case[] = [
   },
   {
     id: "vieta-02",
+    subject: "algebra",
     type_id: "vieta_sign",
     topic: "Квадратные уравнения",
     level: 8,
@@ -1943,6 +1988,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sqabs-02",
+    subject: "algebra",
     type_id: "sqrt_abs",
     topic: "Квадратные корни",
     level: 9,
@@ -1984,6 +2030,7 @@ export const CASES: Case[] = [
   },
   {
     id: "exp-02",
+    subject: "algebra",
     type_id: "exp_divide",
     topic: "Показательные уравнения",
     level: 10,
@@ -2024,6 +2071,7 @@ export const CASES: Case[] = [
   },
   {
     id: "sin-02",
+    subject: "algebra",
     type_id: "sin_sum",
     topic: "Тригонометрия",
     level: 10,
@@ -2070,6 +2118,7 @@ export const CASES: Case[] = [
   },
   {
     id: "log-ok",
+    subject: "algebra",
     type_id: "clean",
     topic: "Логарифмы",
     level: 10,
@@ -2092,6 +2141,7 @@ export const CASES: Case[] = [
   },
   {
     id: "pct-ok",
+    subject: "algebra",
     type_id: "clean",
     topic: "Проценты",
     level: 8,
@@ -2115,6 +2165,7 @@ export const CASES: Case[] = [
   },
   {
     id: "lin-ok",
+    subject: "algebra",
     type_id: "clean",
     topic: "Линейные уравнения",
     level: 8,

@@ -2,13 +2,13 @@
 
 import { useEffect, useRef, useState } from "react";
 import { ArrowsClockwiseIcon, PenNibIcon } from "@phosphor-icons/react/dist/ssr";
-import { getCase, INTERN_LINES, pickPracticeCases, pickReplacement } from "@/lib/catalog";
+import { getCase, INTERN_LINES, pickPracticeCases, pickReplacement, SUBJECT_NAMES } from "@/lib/catalog";
 import { keepNumbersTogether } from "@/lib/format";
 import { fetchInternReply, fetchJudgeVerdict, newId, saveAttempt, type NetOptions } from "@/lib/client";
 import { checkRefutation, describeProof, explainRefutation, parseValues } from "@/lib/refute";
 import { blindSpots, MAX_HINTS, MAX_REFUTE_TRIES, roundScore, stars } from "@/lib/scoring";
 import { getStudent, recordSession, setStudent, type StudentIdentity } from "@/lib/session";
-import type { Case, Outcome } from "@/lib/types";
+import type { Case, Outcome, Subject } from "@/lib/types";
 import {
   addMsg,
   loadGame,
@@ -39,18 +39,28 @@ const TYPING_MS = 500;
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
-export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | null; offline: boolean }) {
+export default function Game({
+  fixedCaseId,
+  offline,
+  subject,
+}: {
+  fixedCaseId: string | null;
+  offline: boolean;
+  subject: Subject;
+}) {
   // Single-case links are stage demos: they always start clean, so only sessions are resumed.
   const persist = fixedCaseId === null;
-  const [game, setGame] = useState<GameState>(() => (persist ? loadGame(offline) : null) ?? newGame(fixedCaseId, 1));
+  const [game, setGame] = useState<GameState>(
+    () => (persist ? loadGame(offline, subject) : null) ?? newGame(fixedCaseId, 1, undefined, subject),
+  );
   const tokenRef = useRef(game.round.token);
   const [student, setStudentState] = useState<StudentIdentity | null>(() => (offline ? null : getStudent()));
   const judgeRef = useRef<{ token: number; verdict: Promise<boolean> } | null>(null);
   const savedRef = useRef(new WeakSet<RoundResult>());
 
   useEffect(() => {
-    if (persist) saveGame(offline, game);
-  }, [game, offline, persist]);
+    if (persist) saveGame(offline, subject, game);
+  }, [game, offline, persist, subject]);
 
   const { round } = game;
   const c = getCase(round.caseId) as Case;
@@ -270,7 +280,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
 
   function restart() {
     judgeRef.current = null;
-    setGame(newGame(fixedCaseId, nextToken()));
+    setGame(newGame(fixedCaseId, nextToken(), undefined, game.subject));
   }
 
   function practice() {
@@ -278,8 +288,10 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
     const cases = pickPracticeCases(
       blindSpots(game.results),
       game.results.map((r) => r.caseId),
+      Math.random,
+      game.subject,
     );
-    setGame(newGame(null, nextToken(), cases));
+    setGame(newGame(null, nextToken(), cases, game.subject));
   }
 
 
@@ -312,7 +324,7 @@ export default function Game({ fixedCaseId, offline }: { fixedCaseId: string | n
           <section key={round.token} className="rise">
             <div className="flex items-start justify-between gap-4">
               <p className="text-muted">
-                {c.topic}, {c.level} класс
+                {SUBJECT_NAMES[c.subject].name} · {c.topic}, {c.level} класс
                 <span className="sm:hidden">
                   {" "}
                   · раунд {game.index + 1} из {game.caseIds.length}

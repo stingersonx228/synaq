@@ -3,7 +3,7 @@
 // message as a JSON field, and every model output is validated by code before use.
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
-import { compactAnswer, normalizeText } from "./catalog";
+import { compactAnswer, normalizeText, SUBJECT_NAMES } from "./catalog";
 import type { Case } from "./types";
 
 export const LLM_TIMEOUT_MS = 6000;
@@ -67,7 +67,7 @@ export function buildJudgeRequest(c: Case, explanation: string): Completion {
   if (!c.bug) throw new Error("judge requires a case with a bug");
   const wrongLines = c.bug.accept_steps.map((n) => `${n}. ${c.steps[n - 1]}`).join("\n");
   const system = [
-    "Ты — внимательный и доброжелательный учитель в обучающей игре по школьной алгебре. Школьник своими словами объясняет, в чём ошибка в решении задачи.",
+    `Ты — внимательный и доброжелательный учитель в обучающей игре по школьной ${SUBJECT_NAMES[c.subject].dative}. Школьник своими словами объясняет, в чём ошибка в решении задачи.`,
     "",
     `Задача: ${c.task}`,
     `Решение с ошибкой:\n${numberedSteps(c)}`,
@@ -124,7 +124,7 @@ export async function judgeWithLlm(c: Case, explanation: string): Promise<boolea
 
 export function buildInternRequest(c: Case, stage: 0 | 1, explanation: string): Completion {
   const system = [
-    "Ты — Алибек, ИИ-стажёр в обучающей игре по алгебре для школьников. Ты решил задачу и уверен, что решение верное. Ученик пытается объяснить тебе ошибку.",
+    `Ты — Алибек, ИИ-стажёр в обучающей игре по ${SUBJECT_NAMES[c.subject].dative} для школьников. Ты решил задачу и уверен, что решение верное. Ученик пытается объяснить тебе ошибку.`,
     "",
     `Задача: ${c.task}`,
     `Твоё решение:\n${numberedSteps(c)}`,

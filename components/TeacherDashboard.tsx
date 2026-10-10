@@ -3,7 +3,7 @@ import { Wordmark } from "@/components/game/ui";
 import LessonPlan from "@/components/teacher/LessonPlan";
 import PrintButton from "@/components/teacher/PrintButton";
 import RoundFeed from "@/components/teacher/RoundFeed";
-import { typeName } from "@/lib/catalog";
+import { SUBJECT_NAMES, typeName, typeSubject } from "@/lib/catalog";
 import { plural } from "@/lib/plural";
 import type { ClassStats } from "@/lib/stats";
 
@@ -91,7 +91,9 @@ export default function TeacherDashboard({
                 {stats.blindSpots.map((t, i) => (
                   <li key={t.typeId} className="grid grid-cols-[2rem_1fr_auto] items-baseline gap-x-4 gap-y-1 py-4 sm:py-5">
                     <span className="font-mono text-lg text-muted">{i + 1}</span>
-                    <span className="text-xl font-semibold leading-snug sm:text-2xl">{t.name}</span>
+                    <span className="text-xl font-semibold leading-snug sm:text-2xl">
+                      {t.name} <SubjectTag typeId={t.typeId} />
+                    </span>
                     <span className="text-right">
                       <span className="block font-display text-3xl font-bold text-bad sm:text-4xl">
                         {pct(t.problemRate)}
@@ -129,7 +131,9 @@ export default function TeacherDashboard({
                 <tbody>
                   {stats.types.map((t) => (
                     <tr key={t.typeId} className="border-t border-line">
-                      <td className="px-4 py-3 font-medium">{t.name}</td>
+                      <td className="px-4 py-3 font-medium">
+                        {t.name} <SubjectTag typeId={t.typeId} />
+                      </td>
                       <td className="px-4 py-3">
                         <div className="flex items-center gap-3">
                           <div className="h-2.5 w-28 overflow-hidden rounded-full bg-surface-2" aria-hidden>
@@ -202,4 +206,15 @@ export default function TeacherDashboard({
 
 function Empty({ children }: { children: ReactNode }) {
   return <p className="mt-8 rounded-xl border border-dashed border-line bg-surface px-5 py-8 text-lg leading-relaxed">{children}</p>;
+}
+
+/** Which subject an error type comes from; nothing for "no error" rounds, which exist in every subject. */
+function SubjectTag({ typeId }: { typeId: string }) {
+  const subject = typeSubject(typeId);
+  if (!subject) return null;
+  return (
+    <span className="ml-1 whitespace-nowrap rounded-full bg-surface-2 px-2 py-0.5 align-middle text-xs font-medium text-muted">
+      {SUBJECT_NAMES[subject].name}
+    </span>
+  );
 }

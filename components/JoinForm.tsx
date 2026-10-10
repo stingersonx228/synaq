@@ -2,8 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, type FormEvent } from "react";
+import { DEFAULT_SUBJECT, SUBJECT_NAMES } from "@/lib/catalog";
 import { joinClass } from "@/lib/client";
 import { setStudent } from "@/lib/session";
+import { SUBJECTS, type Subject } from "@/lib/types";
 import { buttonClass } from "./game/ui";
 
 const CODE_RE = /^[A-HJ-NP-Z2-9]{6}$/;
@@ -24,6 +26,7 @@ export default function JoinForm({ initialCode = "" }: { initialCode?: string })
     if (initialCode) nicknameRef.current?.focus({ preventScroll: true });
   }, [initialCode]);
   const [nickname, setNickname] = useState("");
+  const [subject, setSubject] = useState<Subject>(DEFAULT_SUBJECT);
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
 
@@ -39,7 +42,7 @@ export default function JoinForm({ initialCode = "" }: { initialCode?: string })
     const res = await joinClass(normCode, normNick);
     if (res.ok) {
       setStudent({ studentId: res.studentId, nickname: res.nickname, className: res.className });
-      router.push("/play");
+      router.push(`/play?subject=${subject}`);
       return;
     }
     setPending(false);
@@ -49,7 +52,7 @@ export default function JoinForm({ initialCode = "" }: { initialCode?: string })
     else {
       // No database or no network: play locally without bothering the student.
       setStudent(null);
-      router.push("/play");
+      router.push(`/play?subject=${subject}`);
     }
   }
 
@@ -88,6 +91,27 @@ export default function JoinForm({ initialCode = "" }: { initialCode?: string })
           Не пиши настоящее имя. Учитель узнает тебя по псевдониму.
         </p>
       </div>
+      <fieldset className="flex flex-col gap-2">
+        <legend className="mb-2 font-medium">Предмет</legend>
+        <div className="flex gap-2">
+          {SUBJECTS.map((s) => (
+            <label
+              key={s}
+              className="flex min-h-12 flex-1 cursor-pointer items-center justify-center rounded-xl border border-line bg-ink px-3 text-lg font-medium transition has-[:checked]:border-pen has-[:checked]:bg-pen/[0.07] has-[:checked]:text-pen has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-pen"
+            >
+              <input
+                type="radio"
+                name="subject"
+                value={s}
+                checked={subject === s}
+                onChange={() => setSubject(s)}
+                className="sr-only"
+              />
+              {SUBJECT_NAMES[s].name}
+            </label>
+          ))}
+        </div>
+      </fieldset>
       {error ? (
         <p className="rounded-xl border border-bad/40 bg-bad/10 px-4 py-3" role="alert">
           {error}

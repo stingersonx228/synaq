@@ -195,3 +195,14 @@ describe("rate limit (in-memory window)", () => {
     expect(await takeLlmCall({ studentId: null, ip: "3.3.3.3" })).toBe(false);
   });
 });
+
+describe("prompts name the case's subject", () => {
+  it("speaks of physics for a physics case and of algebra for an algebra case", () => {
+    const physics = getCase("ph-ohm-01")!;
+    const algebra = getCase("pct-01")!;
+    expect(buildJudgeRequest(physics, "x").system).toContain("по школьной физике");
+    expect(buildInternRequest(physics, 0, "x").system).toContain("игре по физике");
+    expect(buildJudgeRequest(algebra, "x").system).toContain("по школьной алгебре");
+    expect(buildInternRequest(algebra, 0, "x").system).not.toContain("физике");
+  });
+});

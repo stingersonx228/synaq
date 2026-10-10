@@ -4,7 +4,8 @@ import JoinForm from "@/components/JoinForm";
 import NotebookSheet from "@/components/landing/NotebookSheet";
 import { Tick, Underline } from "@/components/PenMarks";
 import { buttonClass, Wordmark } from "@/components/game/ui";
-import { CASES, getCase } from "@/lib/catalog";
+import { CASES, getCase, SUBJECT_NAMES } from "@/lib/catalog";
+import { SUBJECTS } from "@/lib/types";
 import { plural } from "@/lib/plural";
 import { codeFromParam } from "@/lib/schemas";
 
@@ -68,17 +69,21 @@ export default async function Home({ searchParams }: PageProps<"/">) {
               </span>
             </h1>
             <p className="mt-8 max-w-[36ch] text-xl leading-relaxed text-muted">
-              Стажёр Алибек решает задачи по алгебре и уверен, что прав. Найди ошибку и опровергни её числом.
+              Стажёр Алибек решает задачи по алгебре и физике и уверен, что прав. Найди ошибку и опровергни её
+              числом.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href="/play" className={buttonClass("primary", "text-lg")}>
-                Начать игру
-                <ArrowRightIcon size={20} weight="bold" aria-hidden />
-              </Link>
-              <a href="#join" className={buttonClass("secondary", "text-lg")}>
-                Войти по коду класса
-              </a>
+            <p className="mt-8 font-medium">Выбери предмет:</p>
+            <div className="mt-3 flex flex-wrap gap-3">
+              {SUBJECTS.map((s, i) => (
+                <Link key={s} href={`/play?subject=${s}`} className={buttonClass(i === 0 ? "primary" : "secondary", "text-lg")}>
+                  {SUBJECT_NAMES[s].name}
+                  <ArrowRightIcon size={20} weight="bold" aria-hidden />
+                </Link>
+              ))}
             </div>
+            <a href="#join" className="mt-5 inline-flex min-h-11 items-center font-semibold text-pen underline underline-offset-4">
+              Есть код класса? Войти
+            </a>
           </div>
 
           <div>
